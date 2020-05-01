@@ -1,0 +1,87 @@
+version: "3.7"
+
+services:
+  devenv:
+    build:
+      context: .
+      dockerfile: Containerfile
+      args:
+        - USER=developer
+
+    # Name / Tag created image
+    image: devenv
+    # Run interactive with pseudo tty
+    stdin_open: true
+    tty: true
+    # Make user id in container same as host user (maintain file ownership)
+    userns_mode: "host"
+    # Disable selinux inside container
+    # (otherwise no permission to access to host users files)
+    security_opt:
+      - label:disable
+    # Set up environment
+    hostname: devcon
+    environment:
+      # For alternate time zones see:
+      # `wikipedia.org/wiki/List_of_tz_database_time_zones`
+      TZ: Europe/London
+      LANG: en_gb.UTF-8
+      HOSTHOME: $HOME
+    working_dir: /home/developer/projects
+
+    volumes:
+      # Mount current users home in container for access to files
+      - type: bind
+        source: $HOME
+        target: $HOME
+      # Mount host user's git configuration file to preserve global settings
+      - type: bind
+        source: $HOME/.config/git
+        target: /home/developer/.config/git
+      # Mount host user's gpg keys
+      - type: bind
+        source: $HOME/.gnupg
+        target: /home/developer/.gnupg
+      # Mount host user's ssh keys
+      - type: bind
+        source: $HOME/.ssh
+        target: /home/developer/.ssh
+      # Mount host docker.sock so containers run on host
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+      # Mount container users home as named volume for persistence of data
+      #- type: volume
+      #  source: developer_home
+      #  target: /home/developer
+      #  volume:
+      #    nocopy: false
+      # Mount projects directory separately as named volume for persistence of data
+      #- type: volume
+      #  source: config
+      #  target: /home/developer/.config
+      #  volume:
+      #    nocopy: false
+      # Mount application data separately as named volume for persistence of data
+      - type: volume
+        source: appdata
+        target: /home/developer/.local/share
+        volume:
+          nocopy: false
+      # Mount projects directory separately as named volume for persistence of data
+      - type: volume
+        source: projects
+        target: /home/developer/projects
+        volume:
+          nocopy: false
+
+
+volumes:
+  #  developer_home:
+  #    name: developer_home
+  #  config:
+  #    name: developer_config
+  appdata:
+    name: developer_appdata
+  projects:
+    name: developer_projects

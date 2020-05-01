@@ -1,0 +1,38 @@
+# Terminal multiplexer
+tmux
+# Shell
+zsh
+# Text editor
+neovim
+# File manager
+ranger
+# Version control
+git
+# For tmux
+# findutils required for something?, hostname and procps required for tmux theme,
+findutils hostname procps
+# For nvim
+python3-neovim
+# For ranger (rifle) to identify file types so it can select an application to open them
+file
+# To set editor settings
+editorconfig
+# For python development also used by nvim configuration
+black pylint python3-pydocstyle
+# For ranger preview of archives (also useful tools)
+atool zip
+# For ranger previews of documents
+poppler-utils odt2txt
+# For ranger preview of media info
+mediainfo
+# For task management and time tracking
+task timew
+# For containers
+docker
+# For automation scripts and calculations
+python ipython
+# For gpg signing
+pinentry
+# Other utilities
+htop rsync
+
