@@ -27,6 +27,8 @@ services:
       TZ: Europe/London
       LANG: en_gb.UTF-8
       HOSTHOME: $HOME
+      # Uncomment if binding ssh auth sock to host's
+      #SSH_AUTH_SOCK: /home/developer/.cache/ssh/ssh_auth.sock
     working_dir: /home/developer/projects
 
     volumes:
@@ -50,6 +52,10 @@ services:
       - type: bind
         source: /var/run/docker.sock
         target: /var/run/docker.sock
+      # Bind ssh auth sock to host's
+      #- type: bind
+      #  source: $SSH_AUTH_SOCK
+      #  target: /home/developer/.cache/ssh/ssh_auth.sock
       # Mount container users home as named volume for persistence of data
       #- type: volume
       #  source: developer_home
