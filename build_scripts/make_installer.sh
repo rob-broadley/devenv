@@ -3,7 +3,20 @@
 # Set defaults
 DISTRO=${DISTRO:-fedora}
 PKG_INSTALL=${PKG_INSTALL:-"sudo dnf install -y"}
-OUTPUT=install.sh
+
+# Get parent of directory which contains this script
+if [ -L $0 ]
+then
+	DIR="$(dirname "$(readlink -f "$0")")"
+else
+	DIR="$(dirname "$0")"
+fi
+DIR="$(dirname "$DIR")"
+
+# Set file locations
+OUTPUT="$DIR/install.sh"
+REQUIREMENTS="$DIR/requirements.txt"
+CONTAINERFILE="$DIR/Containerfile"
 
 
 cat > $OUTPUT << EOF
@@ -38,7 +51,7 @@ copy () {
 }
 
 # Install required packages
-$PKG_INSTALL $(grep -v '^#' requirements.txt | tr "\n" " ")
+$PKG_INSTALL $(grep -v '^#' $REQUIREMENTS | tr "\n" " ")
 
 # Add environment variable to ~.profile
 ensure_line_in_file "export DISTRO=$DISTRO" ~/.profile
@@ -46,7 +59,7 @@ EOF
 
 # Extract environment variables from Containerfile
 ENVS=$(\
-	awk '/^ENV/{ if ($2 != "DISTRO") print $2"="$3; }' Containerfile \
+	awk '/^ENV/{ if ($2 != "DISTRO") print $2"="$3; }' $CONTAINERFILE \
 	| sed -e 's/USER_HOME/HOME/g'\
 )
 
@@ -66,7 +79,7 @@ echo
 
 # Extract copy commands from Containerfile
 echo \# Copy required files
-awk '/^WORKDIR/{flag=1;next}/^COPY/{ if(flag) print "copy", $2, "~/"$3; }' Containerfile
+awk '/^WORKDIR/{flag=1;next}/^COPY/{ if(flag) print "copy", $2, "~/"$3; }' $CONTAINERFILE
 
 # Add blank line
 echo
@@ -80,7 +93,7 @@ echo \# Local setup commands
 LOCAL_SETUP=$(\
 	awk \
 	'/^### BEGIN local_setup/{ flag=1; next }/^### END local_setup/{ flag=0; next }/^RUN/{ if(flag) {for (i=2; i<NF; i++) printf $i " "; print $NF} }' \
-	"Containerfile"\
+	"$CONTAINERFILE"\
 )
 # Set soft-link creation to interactive (ls -si)
 LOCAL_SETUP=$(sed -r "s/ln -sf? /ln -si /" <<< "$LOCAL_SETUP")

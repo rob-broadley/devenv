@@ -6,9 +6,14 @@ Other handy utilities are also included, see requirements.txt for the packages a
 
 ## As a Container
 The development environment can be run as a container.
-This tested approach is to use docker-compose.
-To build the container image run: `docker-compose build devenv`.
-To start a container from the created image run the `start_container.sh` script (`./start_conainer.sh`).
+The tested approach is to use docker-compose.
+To build the container image run: `make image`.
+To start a container from the created image run `make container`.
+
+
+For easy starting from any directory run `make bin` to put `devenv` in `~/.local/bin`.
+A container can then be started by calling `devenv`.
+`devenv` is a soft link to the script called by `make container`.
 
 
 If running as above (without any modifications to the docker compose file), then only two locations will be persistent (attached volumes) /home/developer/projects (for your work) and /home/developer/.local/share (for application data).
@@ -24,8 +29,8 @@ If the host is Mac OS you may need to add `IgnoreUnknown UseKeychain` to `~/.ssh
 
 
 ## Local Install
-A script to set up the environment for the local user can be produced from the container definition file (Containerfile) using the `make_installer.sh` script.
-The produced `.install.sh` script should work for recent versions of Fedora, but may need modifying for other distributions / operating systems.
+A script to set up the environment for the local user can be produced from the container definition file (Containerfile) by running `make install.sh`.
+The produced `install.sh` script should work for recent versions of Fedora, but may need modifying for other distributions / operating systems.
 
 
 
@@ -44,7 +49,7 @@ The setup is designed for the following terminal colors:
 | background-color    |   #282C34 |
 | foreground-color    |   #ABB2BF |
 | black               |   #1F2229 |
-| red           	    |  #E06C75  |
+| red           	    |   #E06C75 |
 | green               |   #98C379 |
 | yellow              |   #D19a66 |
 | blue                |   #61AFEF |

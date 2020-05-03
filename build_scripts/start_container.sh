@@ -9,6 +9,7 @@ fi
 
 (
 cd $DIR
-sh create_missing_host_files.sh
+./create_missing_host_files.sh
+cd ..
 docker-compose run --rm devenv
 )
