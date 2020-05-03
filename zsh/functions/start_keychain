@@ -1,0 +1,4 @@
+function start_keychain() {
+	keychain --dir "$KEYCHAIN_DIR" --inherit any-once --noask --quick --quiet
+	source $KEYCHAIN_DIR/$HOSTNAME-sh
+}

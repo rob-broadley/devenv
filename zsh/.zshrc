@@ -153,6 +153,8 @@ source $ZSH_DIR/themes/powerlevel9k/powerlevel9k.zsh-theme
 # ****************************************************************************
 # Functions
 # ****************************************************************************
+fpath=($ZSH_DIR/functions $fpath)
+autoload start_keychain
 
 # python-env (Auto activate a python virtualenv when entering the project directory)
 VENV=".venv"

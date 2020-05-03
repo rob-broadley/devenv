@@ -31,6 +31,8 @@ task timew
 docker
 # For automation scripts and calculations
 python ipython
+# To manage SSH agent
+keychain
 # For gpg signing
 pinentry
 # Other utilities
