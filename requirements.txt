@@ -29,6 +29,8 @@ mediainfo
 task timew
 # For containers
 docker
+# Build tools
+make
 # For automation scripts and calculations
 python ipython
 # To manage SSH agent
@@ -37,4 +39,3 @@ keychain
 pinentry
 # Other utilities
 htop rsync
-
