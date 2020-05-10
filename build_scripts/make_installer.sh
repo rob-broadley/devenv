@@ -7,86 +7,57 @@ PKG_INSTALL=${PKG_INSTALL:-"sudo dnf install -y"}
 # Get parent of directory which contains this script
 if [ -L $0 ]
 then
-	DIR="$(dirname "$(readlink -f "$0")")"
+	BUILDSCRIPTS="$(dirname "$(readlink -f "$0")")"
 else
-	DIR="$(dirname "$0")"
+	BUILDSCRIPTS="$(dirname "$0")"
 fi
-DIR="$(dirname "$DIR")"
+REPO="$(dirname "$BUILDSCRIPTS")"
+FUNC="$BUILDSCRIPTS/functions"
 
 # Set file locations
-OUTPUT="$DIR/install.sh"
-REQUIREMENTS="$DIR/requirements.txt"
-CONTAINERFILE="$DIR/Containerfile"
+OUTPUT="$REPO/install.sh"
+REQUIREMENTS="$REPO/requirements.txt"
+CONTAINERFILE="$REPO/Containerfile"
 
 
-cat > $OUTPUT << EOF
-#!/bin/sh
-
-ensure_line_in_file () {
-	grep -qF "\$1" "\$2" || ( echo "\$1" >> "\$2" && return 10 )
+insert () {
+	printf %"s\n" "$1" >> $OUTPUT
 }
 
-copy () {
-	src="\$1"
-	dest="\$2"
-	if [ -f "\$src" ]; then
-		cp --interactive --backup=numbered "\$src" "\$dest"
-	elif [ -d "\$src" ]; then
-		src="\$src/."
-		if [ -e "\$dest" ]; then
-			echo "\n\$dest exists."
-			read -n 3 -p "Enter 1 to replace all, 2 for update, 3 for interactive update or anything else to skip: " user_response
-			if [ "\$user_response" == "1" ]; then
-				cp -Rf "\$src" "\$dest"
-			elif [ "\$user_response" == "2" ]; then
-				cp -R --update "\$src" "\$dest"
-			elif [ "\$user_response" == "3" ]; then
-				cp -R --update --interactive "\$src" "\$dest"
-			fi
-		else
-			mkdir -p "\$dest"
-			cp -R "\$src" "\$dest"
-		fi
-	fi
-}
 
+# Add hash bang
+printf %"s\n" "#!/bin/sh" "" > $OUTPUT
+
+# Add functions
+cat "$FUNC/ensure_line_in_file.sh" >> $OUTPUT
+insert "" ""
+cat "$FUNC/copy.sh" >> $OUTPUT
+insert ""
+
+# Add command to install required packages
+cat >> $OUTPUT << EOF
 # Install required packages
 $PKG_INSTALL $(grep -v '^#' $REQUIREMENTS | tr "\n" " ")
 
-# Add environment variable to ~.profile
-ensure_line_in_file "export DISTRO=$DISTRO" ~/.profile
 EOF
 
-# Extract environment variables from Containerfile
-ENVS=$(\
-	awk '/^ENV/{ if ($2 != "DISTRO") print $2"="$3; }' $CONTAINERFILE \
-	| sed -e 's/USER_HOME/HOME/g'\
-)
+# Ensure environment variables are set in .profile
+insert "# Add environment variables to ~.profile"
+source "$BUILDSCRIPTS/env_var_to_profile.sh" >> $OUTPUT
+sed -i '/ensure_line_in_file "export DISTRO/d' $OUTPUT
+insert "ensure_line_in_file \"export DISTRO=$DISTRO\" ~/.profile"
+insert "source ~/.profile"
+
+insert ""
 
 {
-# Add commands to ensure environment variables defined in ~/.profile
-for ENV in $ENVS
-do
-	# Set var locally
-	echo $ENV
-	# Make var persistent
-	setvarline="export $(sed 's/\$/\\$/g' <<< $ENV)"
-	echo ensure_line_in_file \"$setvarline\" \~/.profile
-done
-
-# Add blank line
-echo
-
-# Extract copy commands from Containerfile
-echo \# Copy required files
-awk '/^WORKDIR/{flag=1;next}/^COPY/{ if(flag) print "copy", $2, "~/"$3; }' $CONTAINERFILE
-
-# Add blank line
-echo
-
-echo \# Local setup commands
+	printf %"s\n" "# Copy required files"
+	awk '/^WORKDIR/{flag=1;next}/^COPY/{ if(flag) print "copy", $2, "~/"$3; }' $CONTAINERFILE
 } >> $OUTPUT
 
+insert ""
+
+insert "# Local setup commands"
 
 # Extract commands in local setup block
 # (between ### BEGIN local_setup and END local_setup)
@@ -98,6 +69,5 @@ LOCAL_SETUP=$(\
 # Set soft-link creation to interactive (ls -si)
 LOCAL_SETUP=$(sed -r "s/ln -sf? /ln -si /" <<< "$LOCAL_SETUP")
 cat <<< "$LOCAL_SETUP" >> $OUTPUT
-
 
 chmod +x $OUTPUT
