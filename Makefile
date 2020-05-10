@@ -17,3 +17,9 @@ ${bin_file}: build_scripts/start_container.sh
 
 install.sh: build_scripts/make_installer.sh
 	./$<
+
+devenv.tar: build_scripts/make_wsl_image.sh image
+	./$<
+
+.PHONY: wsl
+wsl: devenv.tar
