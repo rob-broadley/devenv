@@ -7,6 +7,7 @@ services:
       dockerfile: Containerfile
       args:
         - USER=developer
+        - HOST_DOCKER_GID
 
     # Name / Tag created image
     image: devenv

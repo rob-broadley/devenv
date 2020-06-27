@@ -1,11 +1,12 @@
 FROM fedora:32
 
 # Set image labels
-LABEL version="1.0.0"
+LABEL version="1.0.1"
 
 # Set name of user to create and location of their home directory
 ARG USER="developer"
 ARG USER_HOME="/home/$USER"
+ARG HOST_DOCKER_GID=""
 
 # Create env var with distro for convenience
 ENV DISTRO fedora
@@ -30,6 +31,9 @@ ENV TIMEWARRIORDB $XDG_CONFIG_HOME/timewarrior
 ENTRYPOINT ["tmux"]
 CMD ["new-session", "-A", "-s dev"]
 
+# Create docker group with same gid as host docker group
+# Will do nothing unless HOST_DOCKER_GID argument is given
+RUN [ -z "$HOST_DOCKER_GID" ] || groupadd -g "$HOST_DOCKER_GID" docker
 
 # Change dnf configuration to include docs (e.g. man pages)
 RUN sed -i "/^tsflags=nodocs/ c#tsflags=nodocs" /etc/dnf/dnf.conf

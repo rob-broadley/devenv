@@ -6,7 +6,7 @@ container:
 
 .PHONY: image
 image:
-	docker-compose build devenv
+	./build_scripts/build_image.sh
 
 .PHONY: bin
 bin: ${bin_file}
