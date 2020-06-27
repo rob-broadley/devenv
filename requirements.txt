@@ -32,7 +32,7 @@ docker docker-compose
 # Build tools
 make
 # For automation scripts and calculations
-python ipython
+python python-devel ipython
 # To manage SSH agent
 keychain
 # For gpg signing
