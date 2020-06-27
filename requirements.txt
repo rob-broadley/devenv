@@ -28,7 +28,7 @@ mediainfo
 # For task management and time tracking
 task timew
 # For containers
-docker
+docker docker-compose
 # Build tools
 make
 # For automation scripts and calculations
