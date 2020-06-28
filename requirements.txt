@@ -29,6 +29,8 @@ mediainfo
 task timew
 # For containers
 docker docker-compose
+# Compliers
+gcc g++
 # Build tools
 make
 # For automation scripts and calculations
