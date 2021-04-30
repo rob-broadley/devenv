@@ -73,6 +73,9 @@ COPY tmux/.tmux.conf.local $XDG_CONFIG_HOME/tmux/tmux.conf.local
 # Add zsh config files
 COPY zsh $XDG_CONFIG_HOME/zsh
 
+# Add gitstatusd for powerlevel10k
+COPY extras/gitstatusd-linux-x86_64 $XDG_CACHE_HOME/gitstatus/
+
 # Add nvim config files
 COPY nvim/init.vim $XDG_CONFIG_HOME/nvim/init.vim
 COPY nvim/dein.vim $XDG_DATA_HOME/nvim/dein/repos/github.com/Shougo/dein.vim

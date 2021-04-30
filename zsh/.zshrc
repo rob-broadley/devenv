@@ -146,7 +146,7 @@ POWERLEVEL9K_VI_INSERT_MODE_STRING="%%"
 # ****************************************************************************
 # Theme
 # ****************************************************************************
-source $ZSH_DIR/themes/powerlevel9k/powerlevel9k.zsh-theme
+source $ZSH_DIR/themes/powerlevel10k/powerlevel10k.zsh-theme
 
 
 
