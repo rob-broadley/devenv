@@ -138,7 +138,7 @@ function venvnew() {
         python3 -m venv $VENV_DIR
         source $VENV_ACTIVATE
         pip install -U pip
-        pip install black pylint python-language-server pydocstyle
+        pip install black pydocstyle pylint python-language-server rope
     fi
 }
 
