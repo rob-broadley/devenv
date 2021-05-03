@@ -1,7 +1,23 @@
+# ****************************************************************************
+# Set up paths
+# ****************************************************************************
 ZSH_DIR=${ZDOTDIR:-${XDG_CONFIG_HOME:-$HOME/.config}/zsh}
 PLUGIN_DIR=$ZSH_DIR/plugins
 ZSH_DATA=$HOME/.local/share/zsh
 XDG_CACHE_HOME=${XDG_CACHE_HOME:-$HOME/.cache}
+
+
+
+# ****************************************************************************
+# Powerlevel10k instant prompt
+# ****************************************************************************
+# Enable Powerlevel10k instant prompt. Should stay close to the top of $ZSH_DIR/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "$XDG_CACHE_HOME/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "$XDG_CACHE_HOME/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 
 
 # ****************************************************************************
@@ -93,60 +109,13 @@ fi
 # ----------------------------------------------------------------------------
 
 
-# Powerlevel9k
-POWERLEVEL9K_INSTALLATION_PATH=$ZSH_DIR/themes/powerlevel9k
-POWERLEVEL9K_MODE='nerdfont-fontconfig'
-POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(os_icon user dir dir_writable virtualenv vcs status newline vi_mode)
-POWERLEVEL9K_DISABLE_RPROMPT=true
-POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX=""
-POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX=""
-POWERLEVEL9K_PROMPT_ON_NEWLINE=false
-POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
-# OS Icon
-POWERLEVEL9K_OS_ICON_BACKGROUND="silver"
-if [[ $DISTRO == "ubuntu" ]]; then
-    POWERLEVEL9K_OS_ICON_FOREGROUND="202"  # Orange
-else
-    POWERLEVEL9K_OS_ICON_FOREGROUND="027"  # Blue
-fi
-# User
-POWERLEVEL9K_USER_DEFAULT_BACKGROUND="grey"
-POWERLEVEL9K_USER_DEFAULT_FOREGROUND="silver"
-# Path
-POWERLEVEL9K_DIR_DEFAULT_BACKGROUND="cyan"
-POWERLEVEL9K_DIR_DEFAULT_FOREGROUND="black"
-POWERLEVEL9K_DIR_HOME_BACKGROUND="cyan"
-POWERLEVEL9K_DIR_HOME_FOREGROUND="black"
-POWERLEVEL9K_DIR_HOME_SUBFOLDER_BACKGROUND="cyan"
-POWERLEVEL9K_DIR_HOME_SUBFOLDER_FOREGROUND="black"
-POWERLEVEL9K_DIR_ETC_BACKGROUND="cyan"
-POWERLEVEL9K_DIR_ETC_FOREGROUND="black"
-# Python
-POWERLEVEL9K_VIRTUALENV_FOREGROUND="black"
-# Version Control
-POWERLEVEL9K_VCS_CLEAN_FOREGROUND="black"
-POWERLEVEL9K_VCS_MODIFIED_FOREGROUND="black"
-POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND="black"
-POWERLEVEL9K_VCS_SHORTEN_LENGTH=20
-POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH=20
-POWERLEVEL9K_VCS_SHORTEN_STRATEGY="truncate_from_right"
-POWERLEVEL9K_VCS_SHORTEN_DELIMITER=".."
-POWERLEVEL9K_STATUS_OK_BACKGROUND="grey"
-# VI Mode
-POWERLEVEL9K_VI_MODE_NORMAL_BACKGROUND="grey"
-POWERLEVEL9K_VI_MODE_NORMAL_FOREGROUND="silver"
-POWERLEVEL9K_VI_MODE_INSERT_BACKGROUND="grey"
-POWERLEVEL9K_VI_MODE_INSERT_FOREGROUND="silver"
-POWERLEVEL9K_VI_COMMAND_MODE_STRING=":"
-POWERLEVEL9K_VI_INSERT_MODE_STRING="%%"
-# ----------------------------------------------------------------------------
-
-
 
 # ****************************************************************************
 # Theme
 # ****************************************************************************
 source $ZSH_DIR/themes/powerlevel10k/powerlevel10k.zsh-theme
+# To customize prompt, run `p10k configure` or edit $ZSH_DIR/.p10k.zsh.
+[[ ! -f $ZSH_DIR/.p10k.zsh ]] || source $ZSH_DIR/.p10k.zsh
 
 
 
