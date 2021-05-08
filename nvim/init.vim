@@ -30,8 +30,8 @@ if dein#load_state(dein_dir)
 	call dein#add('editorconfig/editorconfig-vim')
 	" Linting
 	call dein#add('w0rp/ale')
-	" Git
-	call dein#add('airblade/vim-gitgutter')
+	" VCS
+	call dein#add('mhinz/vim-signify')
 	call dein#add('tpope/vim-fugitive')
 	" For Python
 	call dein#add('numirias/semshi', {'on_ft': ['python']})
