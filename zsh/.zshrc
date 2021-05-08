@@ -176,6 +176,7 @@ precmd_functions=(_virtualenv_auto_activate $precmd_functions)
 # General
 alias ls='ls --color'
 alias ll='ls -l --color'
+alias la='ls -la --color'
 # ----------------------------------------------------------------------------
 
 
@@ -191,12 +192,10 @@ alias ga='git add'
 alias gc='git commit -S'
 alias gca='git commit -S --amend'
 alias gcfix='git commit -S --fixup'
-alias gri='git rebase -S -i'
+alias gr='git rebase -S -i'
 alias grs='git rebase -S -i --autosquash'
 alias grsm='git rebase -S -i --autosquash origin/master'
-alias grsd='git rebase -S -i --autosquash origin/develop'
 alias gcm='git checkout master'
-alias gcd='git checkout develop'
 # ----------------------------------------------------------------------------
 
 
