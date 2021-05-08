@@ -144,5 +144,4 @@ set completeopt=menu,menuone,preview,noselect,noinsert
 
 
 " Python Setup
-let g:ale_python_black_options = '--line-length=79'
 let g:python_highlight_all = 1
