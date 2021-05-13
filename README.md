@@ -2,6 +2,8 @@
 A set up for a development environment centred on tmux (terminal multiplexer), zsh (shell), neovim (text editor), ranger (file manager).
 Other handy utilities are also included, see requirements.txt for the packages added to a Fedora base.
 
+![Shell Screenshot](screenshots/shell.png)
+
 
 
 ## As a Container
