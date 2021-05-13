@@ -26,9 +26,13 @@ The host users home directory will also be accessible if needed, it will be moun
 #### SSH
 If the host is Mac OS you may need to add `IgnoreUnknown UseKeychain` to `~/.ssh/config` for SSH to work.
 
+## WSL Install
+To build the image (devenv.tar) run `make image` followed by `make wsl`.
+The image can be imported into WSL using `wsl --import devenv (install location) (path to devenv.tar)`.
 
 
-## Local Install
+
+## Local Install (Unmaintained)
 A script to set up the environment for the local user can be produced from the container definition file (Containerfile) by running `make install.sh`.
 The produced `install.sh` script should work for recent versions of Fedora, but may need modifying for other distributions / operating systems.
 
