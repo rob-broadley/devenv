@@ -39,5 +39,7 @@ python python-devel ipython
 keychain
 # For gpg signing
 pinentry
+# IP Tools
+iproute iputils net-tools
 # Other utilities
 htop rsync
