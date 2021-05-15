@@ -22,6 +22,8 @@ source "$BUILDSCRIPTS/env_var_to_profile.sh" >> $LOCAL
 # Make the default user developer
 printf "\n"%"s\n" "sudo sh -c 'echo [user] > /etc/wsl.conf'" >> $LOCAL
 printf %"s\n\n" "sudo sh -c 'echo default=developer >> /etc/wsl.conf'" >> $LOCAL
+# Allow non-root user to use ping
+printf "\n"%"s\n" "sudo setcap cap_net_admin,cap_net_raw+p /usr/bin/ping" >> $LOCAL
 
 chmod +x $LOCAL
 
