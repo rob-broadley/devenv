@@ -17,6 +17,8 @@ printf %"s\n\n" "touch ~/.profile" >> $LOCAL
 
 # Set environment variables in .profile
 source "$BUILDSCRIPTS/env_var_to_profile.sh" >> $LOCAL
+# Source .profile in .zprofile
+printf %"s\n\n" 'ensure_line_in_file "source $HOME/.profile" $XDG_CONFIG_HOME/zsh/.zprofile' >> $LOCAL
 
 # Set WSL configuration
 # Make the default user developer
