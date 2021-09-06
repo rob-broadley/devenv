@@ -33,6 +33,8 @@ if dein#load_state(dein_dir)
 	" VCS
 	call dein#add('mhinz/vim-signify')
 	call dein#add('tpope/vim-fugitive')
+	" Commenting
+	call dein#add('tpope/vim-commentary')
 	" For Python
 	call dein#add('numirias/semshi', {'on_ft': ['python']})
 	" For Pandoc / Markdown
@@ -129,6 +131,11 @@ let g:goyo_height = '100%'
 set complete+=kspell
 inoremap <silent> <C-s> <C-x><C-k>
 inoremap <silent> <S-Tab> <C-x><Tab>
+
+
+" Commenting (Make Ctrl+/ comment line or selection)
+vnoremap <C-_> :Commentary<cr>
+nnoremap <C-_> :Commentary<cr>
 
 
 " Linting
