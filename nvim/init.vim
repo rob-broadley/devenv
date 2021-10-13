@@ -139,7 +139,7 @@ nnoremap <C-_> :Commentary<cr>
 
 
 " Linting
-let g:ale_linters = {'python': ['pylint', 'pydocstyle', 'pyls']}
+let g:ale_linters = {'python': ['pylint', 'pydocstyle', 'pyright', 'mypy']}
 let g:ale_fixers = {
 	\	'*': ['remove_trailing_lines', 'trim_whitespace'],
 	\ 'python': ['black', 'isort'],
