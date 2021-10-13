@@ -49,6 +49,9 @@ COPY requirements.txt /tmp/requirements.txt
 # Add Packages
 RUN dnf install -y $(grep -v '^#' /tmp/requirements.txt | tr "\n" " ")
 
+# Add Extras using language specific package managers
+RUN npm install --global pyright
+
 # Remove default zshrc from skel so user does not inherit it
 RUN rm -f /etc/skel/.zshrc
 
@@ -90,11 +93,11 @@ COPY taskwarrior/timewarrior.cfg $TIMEWARRIORDB/
 # Add useful scripts
 COPY scripts .local/bin
 
-# Set up user directories
-RUN mkdir -p projects
-
 # Ensure container user home is owned by container user
 RUN sudo chown -R "$USER":"$USER" .
+
+# Set up user directories
+RUN mkdir -p projects
 
 ### BEGIN local_setup
 # Ensure cache directory exists
