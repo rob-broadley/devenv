@@ -1,0 +1,25 @@
+{
+	"coc.preferences.promptInput": false,
+	"coc.preferences.promptWorkspaceEdit": false,
+	"diagnostic.checkCurrentLine": true,
+	"diagnostic.floatConfig": {
+	  "border": true
+	},
+	"hover.floatConfig": {
+	  "border": true
+	},
+	"suggest.floatConfig": {
+	  "border": true
+	},
+	"signature.floatConfig": {
+	  "border": true
+	},
+	// Language Specific Settings
+	"python.formatting.provider": "black",
+	"python.linting.enabled": true,  // enable additional linters.
+	"python.linting.lintOnSave": true,
+	"python.linting.mypyEnabled": true,
+	"python.linting.pydocstyleEnabled": true,
+	"python.linting.pylintEnabled": true,
+	"python.linting.pylintUseMinimalCheckers": false
+}
