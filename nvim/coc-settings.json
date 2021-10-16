@@ -15,6 +15,7 @@
 	  "border": true
 	},
 	// Language Specific Settings
+	"pydocstring.formatter": "google",
 	"python.formatting.provider": "black",
 	"python.linting.enabled": true,  // enable additional linters.
 	"python.linting.lintOnSave": true,

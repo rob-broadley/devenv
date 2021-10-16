@@ -163,6 +163,8 @@ function! s:show_documentation()
   endif
 endfunction
 " Key bindings.
+" Show code action menu
+nmap <silent> ca <Plug>(coc-codeaction-line)
 " Go to definition and references.
 nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gr <Plug>(coc-references)
