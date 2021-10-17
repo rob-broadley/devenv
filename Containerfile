@@ -125,6 +125,8 @@ RUN ln -s $XDG_DATA_HOME/timewarrior $TIMEWARRIORDB/data
 # Set up nvim plugins
 RUN nvim --headless -c "call dein#install()" +qa
 RUN nvim --headless -c ":CocInstall -sync coc-json coc-pyright coc-pydocstring" +qa
+# Update remote plugins - needed for semshi to work
+RUN nvim --headless -c ":silent UpdateRemotePlugins" +qa
 
 # Set up taskwarrior on-modify hook for timewarrior
 RUN mkdir -p $XDG_DATA_HOME/task/hooks
