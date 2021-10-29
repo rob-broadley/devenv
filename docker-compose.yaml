@@ -16,8 +16,12 @@ services:
     tty: true
     # Make user id in container same as host user (maintain file ownership)
     userns_mode: "host"
+    # Make container share host's network.
+    # This allows host to access servers run inside container
+    # without explicit binding of ports.
+    network_mode: "host"
     # Disable selinux inside container
-    # (otherwise no permission to access to host users files)
+    # (otherwise no permission to access host users files).
     security_opt:
       - label:disable
     # Set up environment
@@ -63,7 +67,7 @@ services:
       #  target: /home/developer
       #  volume:
       #    nocopy: false
-      # Mount projects directory separately as named volume for persistence of data
+      # Mount config directory separately as named volume for persistence of data
       #- type: volume
       #  source: config
       #  target: /home/developer/.config
