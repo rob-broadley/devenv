@@ -1,7 +1,7 @@
-FROM fedora:34
+FROM fedora:35
 
 # Set image labels
-LABEL version="34.0.0"
+LABEL version="35.0.0"
 
 # Set name of user to create and location of their home directory
 ARG USER="developer"
