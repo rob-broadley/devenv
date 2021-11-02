@@ -21,5 +21,15 @@ then
 	git config --global commit.gpgsign true
 fi
 
+git config --global blame.coloring highlightRecent
+git config --global diff.colorMoved zebra
 git config --global diff.tool nvimdiff
+git config --global merge.log true
 git config --global merge.tool nvimdiff
+git config --global pull.rebase true
+git config --global rebase.autosquash true
+
+
+printf "\nYour global git configuration"
+printf "\n=============================\n"
+git config --global --list

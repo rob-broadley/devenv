@@ -192,9 +192,8 @@ alias ga='git add'
 alias gc='git commit'
 alias gca='git commit --amend'
 alias gcfix='git commit --fixup'
-alias gr='git rebase -i'
-alias grs='git rebase -i --autosquash'
-alias grsm='git rebase -i --autosquash origin/master'
+alias gr='git rebase --interactive'
+alias grm='git rebase --interactive origin/master'
 alias gcm='git checkout master'
 # ----------------------------------------------------------------------------
 
