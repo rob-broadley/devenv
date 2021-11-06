@@ -7,16 +7,12 @@ else
 	DIR="$(dirname "$0")"
 fi
 
-if [ -z $1 ]
-then
-	EXTRA_ARGS=""
-else
-	EXTRA_ARGS="--workdir=$(realpath $1)"
-fi
-
-(
+CONTAINER_ID=$(
 cd $DIR
 ./create_missing_host_files.sh
 cd ..
-docker-compose run --rm $EXTRA_ARGS devenv
+docker-compose up --detach
+echo $(docker-compose ps --quiet --filter image=devenv)
 )
+
+docker attach $CONTAINER_ID
