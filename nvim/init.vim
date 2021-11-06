@@ -123,7 +123,7 @@ if (has("autocmd") && !has("gui_running"))
 		autocmd ColorScheme * call onedark#set_highlight("Normal", { "fg": s:white }) " `bg` will not be styled since there is no `bg` setting
 	augroup END
 endif
-colorscheme onedark
+silent! colorscheme onedark
 
 
 " Goyo
