@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# Temporarily open an new window with clipboard shown in pager
+tmux new-window "tmux saveb - | less"
