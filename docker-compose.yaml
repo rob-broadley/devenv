@@ -6,11 +6,12 @@ services:
       context: .
       dockerfile: Containerfile
       args:
+        - VERSION
         - USER=developer
         - HOST_DOCKER_GID
 
     # Name / Tag created image
-    image: devenv
+    image: devenv:$VERSION
     # Run interactive with pseudo tty
     stdin_open: true
     tty: true

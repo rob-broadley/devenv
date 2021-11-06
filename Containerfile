@@ -1,8 +1,5 @@
 FROM fedora:35
 
-# Set image labels
-LABEL version="35.0.0"
-
 # Set name of user to create and location of their home directory
 ARG USER="developer"
 ARG USER_HOME="/home/$USER"
@@ -136,5 +133,9 @@ RUN cp /usr/share/doc/timew/ext/on-modify.timewarrior $XDG_DATA_HOME/task/hooks/
 RUN sed -i '1 i #!/usr/bin/env python3' $XDG_DATA_HOME/task/hooks/on-modify.timewarrior
 RUN chmod +x $XDG_DATA_HOME/task/hooks/on-modify.timewarrior
 ### END local_setup
+
+# Set image labels
+ARG VERSION="latest"
+LABEL version=$VERSION
 
 # vim: set ft=dockerfile:
