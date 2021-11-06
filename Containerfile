@@ -48,6 +48,8 @@ RUN dnf update -y
 COPY requirements.txt /tmp/requirements.txt
 # Add Packages
 RUN dnf install -y $(grep -v '^#' /tmp/requirements.txt | tr "\n" " ")
+# Remove directories used by dnf that are just taking up space
+RUN rm -rf /var/cache /var/log/dnf*
 
 # Add Extras using language specific package managers
 RUN npm install --global pyright
