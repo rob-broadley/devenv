@@ -15,6 +15,9 @@ ENV TERM xterm-256color
 ENV VISUAL nvim
 ENV EDITOR $VISUAL
 
+# Configure less
+ENV LESS="--clear-screen --RAW-CONTROL-CHARS --tabs 2 --mouse"
+
 # XDG Directory Specification
 ENV XDG_DATA_HOME $USER_HOME/.local/share
 ENV XDG_CONFIG_HOME $USER_HOME/.config
