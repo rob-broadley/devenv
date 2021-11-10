@@ -23,10 +23,6 @@ ENV XDG_DATA_HOME $USER_HOME/.local/share
 ENV XDG_CONFIG_HOME $USER_HOME/.config
 ENV XDG_CACHE_HOME $USER_HOME/.cache
 
-# Set locations of time/task warrior configurations
-ENV TASKRC $XDG_CONFIG_HOME/task/taskrc
-ENV TIMEWARRIORDB $XDG_CONFIG_HOME/timewarrior
-
 # Run tmux session named dev when container starts
 ENTRYPOINT ["tmux"]
 CMD ["new-session", "-A", "-s dev"]
@@ -89,10 +85,6 @@ COPY nvim/dein.vim $XDG_DATA_HOME/nvim/dein/repos/github.com/Shougo/dein.vim
 # Add editorconfig
 COPY .editorconfig $XDG_CONFIG_HOME/editorconfig
 
-# Add task and time warrior config files
-COPY taskwarrior/taskrc $TASKRC
-COPY taskwarrior/timewarrior.cfg $TIMEWARRIORDB/
-
 # Add useful scripts
 COPY scripts .local/bin
 
@@ -118,12 +110,6 @@ RUN mkdir -p $XDG_DATA_HOME/zsh
 # Set up symlink for editorconfig
 RUN ln -s $XDG_CONFIG_HOME/editorconfig .editorconfig
 
-# Ensure timewarrior data directory exists
-RUN mkdir -p $XDG_DATA_HOME/timewarrior
-# Set up symlink to where timew expects to find data
-# timew currently doesn't allow setting different locations for config and data
-RUN ln -s $XDG_DATA_HOME/timewarrior $TIMEWARRIORDB/data
-
 # Set up nvim plugins
 RUN nvim --headless -c "call dein#install()" +qa
 RUN nvim --headless -c ":CocInstall -sync coc-json coc-pyright coc-pydocstring" +qa
@@ -132,11 +118,6 @@ RUN nvim --headless -c ":silent UpdateRemotePlugins" +qa
 # Install doq (required by coc-pydocstring).
 RUN (export script=".local/bin/install_coc_pydocstring_doq.sh" && $script && rm $script)
 
-# Set up taskwarrior on-modify hook for timewarrior
-RUN mkdir -p $XDG_DATA_HOME/task/hooks
-RUN cp /usr/share/doc/timew/ext/on-modify.timewarrior $XDG_DATA_HOME/task/hooks/
-RUN sed -i '1 i #!/usr/bin/env python3' $XDG_DATA_HOME/task/hooks/on-modify.timewarrior
-RUN chmod +x $XDG_DATA_HOME/task/hooks/on-modify.timewarrior
 ### END local_setup
 
 # Set image labels
