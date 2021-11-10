@@ -1,10 +1,10 @@
 #!/bin/sh
 
 read -p "Enter name (First_name Last_Name): " name
-git conifg --global user.name "$name"
+git config --global user.name "$name"
 
 read -p "Enter email address: " email
-git conifg --global user.email "$email"
+git config --global user.email "$email"
 
 read -p "Do you want to sign commits (y/n)? " sign
 if [ $sign = "y" ]
@@ -17,7 +17,7 @@ then
 	printf "\nAvailable Keys:\n===============\n"
 	gpg --list-keys
 	read -p "Enter signing key: " key
-	git conifg --global user.signingkey "$key"
+	git config --global user.signingkey "$key"
 	git config --global commit.gpgsign true
 fi
 
