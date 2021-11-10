@@ -118,6 +118,9 @@ RUN nvim --headless -c ":silent UpdateRemotePlugins" +qa
 # Install doq (required by coc-pydocstring).
 RUN (export script=".local/bin/install_coc_pydocstring_doq.sh" && $script && rm $script)
 
+# Tidy up
+RUN rm -rf .npm $XDG_CACHE_HOME/pip
+
 ### END local_setup
 
 # Set image labels
