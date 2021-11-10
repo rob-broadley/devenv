@@ -129,6 +129,8 @@ RUN nvim --headless -c "call dein#install()" +qa
 RUN nvim --headless -c ":CocInstall -sync coc-json coc-pyright coc-pydocstring" +qa
 # Update remote plugins - needed for semshi to work
 RUN nvim --headless -c ":silent UpdateRemotePlugins" +qa
+# Install doq (required by coc-pydocstring).
+RUN (export script=".local/bin/install_coc_pydocstring_doq.sh" && $script && rm $script)
 
 # Set up taskwarrior on-modify hook for timewarrior
 RUN mkdir -p $XDG_DATA_HOME/task/hooks
