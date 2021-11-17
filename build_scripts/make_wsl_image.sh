@@ -22,7 +22,10 @@ printf %"s\n\n" "touch ~/.profile" >> $LOCAL
 # Set environment variables in .profile
 source "$BUILDSCRIPTS/env_var_to_profile.sh" >> $LOCAL
 # Source .profile in .zprofile
-printf %"s\n\n" 'ensure_line_in_file "source $HOME/.profile" $XDG_CONFIG_HOME/zsh/.zprofile' >> $LOCAL
+printf "\n"%"s\n\n" 'ensure_line_in_file "source $HOME/.profile" $XDG_CONFIG_HOME/zsh/.zprofile' >> $LOCAL
+# Make Home and End keys work in WSL / Windows Terminal.
+printf %"s\n" 'ensure_line_in_file "bind -n Home send Escape \"OH\"" $XDG_CONFIG_HOME/tmux/tmux.conf.local' >> $LOCAL
+printf %"s\n\n" 'ensure_line_in_file "bind -n End send Escape \"OF\"" $XDG_CONFIG_HOME/tmux/tmux.conf.local' >> $LOCAL
 
 # Set WSL configuration
 # Make the default user developer
