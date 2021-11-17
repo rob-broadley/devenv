@@ -28,9 +28,9 @@ printf %"s\n" 'ensure_line_in_file "bind -n Home send Escape \"OH\"" $XDG_CONFIG
 printf %"s\n\n" 'ensure_line_in_file "bind -n End send Escape \"OF\"" $XDG_CONFIG_HOME/tmux/tmux.conf.local' >> $LOCAL
 
 # Set WSL configuration
-# Make the default user developer
+# Make the default wsl user the one used in the container.
 printf "\n"%"s\n" "sudo sh -c 'echo [user] > /etc/wsl.conf'" >> $LOCAL
-printf %"s\n\n" "sudo sh -c 'echo default=developer >> /etc/wsl.conf'" >> $LOCAL
+printf %"s\n\n" 'sudo sh -c "echo default=$(whoami) >> /etc/wsl.conf"' >> $LOCAL
 # Allow non-root user to use ping
 printf "\n"%"s\n" "sudo setcap cap_net_admin,cap_net_raw+p /usr/bin/ping" >> $LOCAL
 
