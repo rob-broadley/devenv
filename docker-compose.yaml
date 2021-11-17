@@ -7,7 +7,7 @@ services:
       dockerfile: Containerfile
       args:
         - VERSION
-        - USER=developer
+        - USER=$CONTAINER_USER
         - HOST_DOCKER_GID
 
     # Name / Tag created image
@@ -34,8 +34,8 @@ services:
       LANG: en_gb.UTF-8
       HOSTHOME: $HOME
       # Uncomment if binding ssh auth sock to host's
-      #SSH_AUTH_SOCK: /home/developer/.cache/ssh/ssh_auth.sock
-    working_dir: /home/developer/projects
+      #SSH_AUTH_SOCK: /home/$CONTAINER_USER/.cache/ssh/ssh_auth.sock
+    working_dir: /home/$CONTAINER_USER/projects
 
     volumes:
       # Mount current users home in container for access to files
@@ -45,15 +45,15 @@ services:
       # Mount host user's git configuration file to preserve global settings
       - type: bind
         source: $HOME/.config/git
-        target: /home/developer/.config/git
+        target: /home/$CONTAINER_USER/.config/git
       # Mount host user's gpg keys
       - type: bind
         source: $HOME/.gnupg
-        target: /home/developer/.gnupg
+        target: /home/$CONTAINER_USER/.gnupg
       # Mount host user's ssh keys
       - type: bind
         source: $HOME/.ssh
-        target: /home/developer/.ssh
+        target: /home/$CONTAINER_USER/.ssh
       # Mount host docker.sock so containers run on host
       - type: bind
         source: /var/run/docker.sock
@@ -61,29 +61,29 @@ services:
       # Bind ssh auth sock to host's
       #- type: bind
       #  source: $SSH_AUTH_SOCK
-      #  target: /home/developer/.cache/ssh/ssh_auth.sock
+      #  target: /home/$CONTAINER_USER/.cache/ssh/ssh_auth.sock
       # Mount container users home as named volume for persistence of data
       #- type: volume
       #  source: developer_home
-      #  target: /home/developer
+      #  target: /home/$CONTAINER_USER
       #  volume:
       #    nocopy: false
       # Mount config directory separately as named volume for persistence of data
       #- type: volume
       #  source: config
-      #  target: /home/developer/.config
+      #  target: /home/$CONTAINER_USER/.config
       #  volume:
       #    nocopy: false
       # Mount application data separately as named volume for persistence of data
       - type: volume
         source: appdata
-        target: /home/developer/.local/share
+        target: /home/$CONTAINER_USER/.local/share
         volume:
           nocopy: false
       # Mount projects directory separately as named volume for persistence of data
       - type: volume
         source: projects
-        target: /home/developer/projects
+        target: /home/$CONTAINER_USER/projects
         volume:
           nocopy: false
 
