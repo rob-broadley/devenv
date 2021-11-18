@@ -28,9 +28,16 @@ The host users home directory will also be accessible if needed, it will be moun
 #### SSH
 If the host is Mac OS you may need to add `IgnoreUnknown UseKeychain` to `~/.ssh/config` for SSH to work.
 
+
+
 ## WSL Install
 To build the image (devenv.tar) run `make image` followed by `make wsl`.
 The image can be imported into WSL using `wsl --import devenv (install location) (path to devenv.tar)`.
+
+The default WSL distribution can be set to devenv using `wsl --setdefault devenv`.
+
+If using Windows Terminal set the `command line` option in settings to `wsl --distribution devenv zsh --login` for zsh on start up,
+or `wsl --distribution devenv tmux new-session -A -s dev` for tmux on start up.
 
 
 
