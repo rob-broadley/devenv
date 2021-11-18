@@ -221,4 +221,7 @@ alias fmcd='ranger --choosedir=$XDG_CACHE_HOME/.rangerdir; LASTDIR=`cat $XDG_CAC
 alias vim='nvim'
 alias vi='nvim'
 alias vimdiff='nvim -d'
+
+# tmux
+alias tmux0='tmux new-session -A -s 0'
 # ----------------------------------------------------------------------------
