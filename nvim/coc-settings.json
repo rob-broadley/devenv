@@ -1,7 +1,7 @@
 {
 	"coc.preferences.promptInput": false,
 	"coc.preferences.promptWorkspaceEdit": false,
-	"diagnostic.checkCurrentLine": true,
+	"diagnostic.checkCurrentLine": false,
 	"diagnostic.floatConfig": {
 	  "border": true
 	},
