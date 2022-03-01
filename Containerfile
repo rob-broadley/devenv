@@ -112,11 +112,9 @@ RUN ln -s $XDG_CONFIG_HOME/editorconfig .editorconfig
 
 # Set up nvim plugins
 RUN nvim --headless -c "call dein#install()" +qa
-RUN nvim --headless -c ":CocInstall -sync coc-json coc-pyright coc-pydocstring" +qa
+RUN nvim --headless -c ":CocInstall -sync coc-json coc-pyright" +qa
 # Update remote plugins - needed for semshi to work
 RUN nvim --headless -c ":silent UpdateRemotePlugins" +qa
-# Install doq (required by coc-pydocstring).
-RUN (export script=".local/bin/install_coc_pydocstring_doq.sh" && $script && rm $script)
 
 # Tidy up
 RUN rm -rf .npm $XDG_CACHE_HOME/pip
