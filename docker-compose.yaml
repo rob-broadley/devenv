@@ -35,13 +35,21 @@ services:
       HOSTHOME: $HOME
       # Uncomment if binding ssh auth sock to host's
       #SSH_AUTH_SOCK: /home/$CONTAINER_USER/.cache/ssh/ssh_auth.sock
-    working_dir: /home/$CONTAINER_USER/projects
+    working_dir: /home/$CONTAINER_USER
 
     volumes:
       # Mount current users home in container for access to files
       - type: bind
         source: $HOME
         target: $HOME
+      # Mount projects directory into container user home
+      - type: bind
+        source: $HOME/projects
+        target: /home/$CONTAINER_USER/projects
+      # Mount repos directory into container user home
+      - type: bind
+        source: $HOME/repos
+        target: /home/$CONTAINER_USER/repos
       # Mount host user's git configuration file to preserve global settings
       - type: bind
         source: $HOME/.config/git
@@ -62,12 +70,6 @@ services:
       #- type: bind
       #  source: $SSH_AUTH_SOCK
       #  target: /home/$CONTAINER_USER/.cache/ssh/ssh_auth.sock
-      # Mount container users home as named volume for persistence of data
-      #- type: volume
-      #  source: developer_home
-      #  target: /home/$CONTAINER_USER
-      #  volume:
-      #    nocopy: false
       # Mount config directory separately as named volume for persistence of data
       #- type: volume
       #  source: config
@@ -80,20 +82,10 @@ services:
         target: /home/$CONTAINER_USER/.local/share
         volume:
           nocopy: false
-      # Mount projects directory separately as named volume for persistence of data
-      - type: volume
-        source: projects
-        target: /home/$CONTAINER_USER/projects
-        volume:
-          nocopy: false
 
 
 volumes:
-  #  developer_home:
-  #    name: developer_home
   #  config:
   #    name: developer_config
   appdata:
     name: developer_appdata
-  projects:
-    name: developer_projects

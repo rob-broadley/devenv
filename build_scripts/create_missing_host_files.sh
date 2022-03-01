@@ -7,6 +7,8 @@ DIRECTORIES=(\
 	$HOME/.gnupg \
 	$HOME/.ssh \
 	$HOME/.config/git \
+	$HOME/projects \
+	$HOME/repos \
 )
 
 

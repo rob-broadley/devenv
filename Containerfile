@@ -91,9 +91,6 @@ COPY scripts .local/bin
 # Ensure container user home is owned by container user
 RUN sudo chown -R "$USER":"$USER" .
 
-# Set up user directories
-RUN mkdir -p projects
-
 ### BEGIN local_setup
 # Ensure cache directory exists
 RUN mkdir -p $XDG_CACHE_HOME
