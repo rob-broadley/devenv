@@ -33,6 +33,7 @@ services:
       TZ: Europe/London
       LANG: en_gb.UTF-8
       HOSTHOME: $HOME
+      HOSTUSER: $USER
       # Uncomment if binding ssh auth sock to host's
       #SSH_AUTH_SOCK: /home/$CONTAINER_USER/.cache/ssh/ssh_auth.sock
     working_dir: /home/$CONTAINER_USER

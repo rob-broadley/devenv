@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# SSH to host system (get hos shell).
+# Change to CWD / bind source if possible.
+
+case $(readlink -f .)/ in
+	"$(readlink -f $HOSTHOME)"/*)
+		ssh -t $HOSTUSER@localhost "cd $PWD && exec \$SHELL"
+		;;
+	"$(readlink -f $HOME/projects)"/*)
+		ssh -t $HOSTUSER@localhost "cd ${PWD/${HOME}/${HOSTHOME}} && exec \$SHELL"
+		;;
+	"$(readlink -f $HOME/repos)"/*)
+		ssh -t $HOSTUSER@localhost "cd ${PWD/${HOME}/${HOSTHOME}} && exec \$SHELL"
+		;;
+	*)
+		ssh $HOSTUSER@localhost
+		;;
+esac
