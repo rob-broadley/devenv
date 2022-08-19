@@ -70,6 +70,8 @@ set number
 set breakindent
 set showbreak=->
 set expandtab
+" Toggle paste mode.
+set pastetoggle=<Leader>p
 " Use tabs for make files
 autocmd FileType make setlocal noexpandtab
 " Spelling
