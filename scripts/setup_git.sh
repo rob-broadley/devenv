@@ -24,10 +24,21 @@ fi
 git config --global blame.coloring highlightRecent
 git config --global diff.colorMoved zebra
 git config --global diff.tool nvimdiff
+git config --global log.date auto:relative
 git config --global merge.log true
 git config --global merge.tool nvimdiff
 git config --global pull.rebase true
 git config --global rebase.autosquash true
+
+# Aliases
+git config --global alias.aliases "config --get-regexp '^alias\\.'"
+git config --global alias.amend "commit --amend"
+git config --global alias.fix "commit --fixup"
+git config --global alias.pushf "push --force-with-lease"
+git config --global alias.rebase-keep-date "rebase --interactive --committer-date-is-author-date"
+git config --global alias.rebase-keep-merge "rebase --interactive --rebase-merges"
+git config --global alias.tree "log --graph --all --oneline"
+git config --global alias.tree-detailed "log --graph --all"
 
 
 printf "\nYour global git configuration"
