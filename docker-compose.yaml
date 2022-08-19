@@ -87,6 +87,6 @@ services:
 
 volumes:
   #  config:
-  #    name: developer_config
+  #    name: devenv_user_config
   appdata:
-    name: developer_appdata
+    name: devenv_user_appdata
