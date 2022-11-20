@@ -25,7 +25,7 @@ ENV XDG_CACHE_HOME $USER_HOME/.cache
 
 # Run tmux session named dev when container starts
 ENTRYPOINT ["tmux"]
-CMD ["new-session", "-A", "-s dev"]
+CMD ["new-session", "-A", "-s", "dev"]
 
 # Create docker group with same gid as host docker group
 # Will do nothing unless HOST_DOCKER_GID argument is given
