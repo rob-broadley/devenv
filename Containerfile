@@ -1,4 +1,4 @@
-FROM fedora:36
+FROM fedora:37
 
 # Set name of user to create and location of their home directory
 ARG USER="developer"
