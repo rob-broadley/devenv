@@ -109,9 +109,10 @@ RUN ln -s $XDG_CONFIG_HOME/editorconfig .editorconfig
 
 # Set up nvim plugins
 RUN nvim --headless -c "call dein#install()" +qa
-RUN nvim --headless -c ":CocInstall -sync coc-json coc-pyright" +qa
 # Update remote plugins - needed for semshi to work
 RUN nvim --headless -c ":silent UpdateRemotePlugins" +qa
+# Install Coc Plugins
+RUN nvim --headless -c ":CocInstall -sync coc-json coc-pyright" +qa
 
 # Tidy up
 RUN rm -rf .npm $XDG_CACHE_HOME/pip
