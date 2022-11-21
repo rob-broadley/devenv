@@ -134,9 +134,12 @@ let g:goyo_height = '100%'
 
 
 " Completion
+" Autocomplete with dictionary words when spell check is on.
 set complete+=kspell
+" Map Ctrl+s to word suggestions.
 inoremap <silent> <C-s> <C-x><C-k>
-inoremap <silent> <S-Tab> <C-x><Tab>
+" Map enter to except suggestion.
+inoremap <expr> <cr> coc#pum#visible() ? coc#_select_confirm() : "\<CR>"
 
 
 " Commenting (Make Ctrl+/ comment line or selection)
@@ -170,12 +173,12 @@ nmap <silent> ca <Plug>(coc-codeaction-line)
 " Go to definition and references.
 nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gr <Plug>(coc-references)
-" Rename
+" Rename with F2.
 nmap <F2> <Plug>(coc-rename)
-" Auto-format.
+" Auto-format with leader f.
 nmap <Leader>f <Plug>(ale_fix)
-" Use K to show documentation in preview window.
-nnoremap <silent> K :call <SID>show_documentation()<CR>
+" Use H to show documentation in preview window.
+nnoremap <silent> H :call <SID>show_documentation()<CR>
 
 
 " Python Setup
