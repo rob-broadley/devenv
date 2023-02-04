@@ -40,4 +40,4 @@ pinentry
 # IP Tools
 iproute iputils net-tools
 # Other utilities
-htop rsync
+htop rsync tree
