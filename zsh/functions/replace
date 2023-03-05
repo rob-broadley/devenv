@@ -1,0 +1,86 @@
+__usage="
+Usage: $(basename $0) [OPTIONS]
+------------------------------------------------------------------------------
+Options:
+  -d, --directory=DIR          Directory to search (defaults to CWD).
+  -i, --include=GLOB           Search only files whose basename matched GLOB
+                               (defaults to all).
+  -f, --find=STRING            The string which will be replaced (required).
+  -r, --replace=STRING         The new string (required).
+  -h, --help                   Show this help and exit.
+
+Example:
+  $(basename $0) -d . -i '*.md' -f misake -r mistake
+"
+
+# Process CLI args.
+nopts=$#
+if [ $nopts -gt 0 ]
+then
+	zparseopts -D -E -F - \
+		d:=directory -directory:=directory \
+		i:=include -include:=include \
+		f:=find -find:=find \
+		r:=replace -replace:=replace \
+		h=help -help=help \
+		|| (echo "Error parsing args" && return 1)
+
+	help=${#help}
+fi
+
+# If no CLI args or help arg given, show help and exit.
+if [ $nopts -eq 0 ] || [ $help -gt 0 ]
+then
+	echo $__usage
+	return 0
+fi
+
+# Extract value for directory, default to '.'.
+directory=${directory[-1]:=.}
+# Extract value for include, default to '*'.
+include=${include[-1]:=*}
+# Extract value for find.
+find=${find[-1]}
+# Extract value for replace.
+replace=${replace[-1]}
+
+# Exit with error if find or replace args not given.
+if [ -z $find ]
+then
+	echo "Missing argument -f/--find"
+	return 1
+fi
+if [ -z $replace ]
+then
+	echo "Missing argument -r/--replace"
+	return 1
+fi
+
+# Get array of files to perform replace in.
+files=($(grep --files-with-matches --include=$include --recursive $find $directory))
+if [ ${#files[@]} -eq 0 ]
+then
+	echo "No files containing $find found!"
+	return 1
+fi
+
+# For each file found:
+#   - Show the text surrounding the matches.
+#   - Ask the user if they want to replace all, replace interactively or skip the file.
+#   - Perform the replace.
+find $files \
+	-type f \
+	-exec sh -c "\
+		echo -e '\nMatches in $(tput setaf 5){}$(tput sgr0):'
+		grep --only-matching --extended-regexp '[^[:space:]]{0,25}$find.{0,25}' {} \
+			| sed 's,$find,$(tput setaf 3)&$(tput sgr0),'
+		echo -e '\nReplace in $(tput setaf 5){}$(tput sgr0)?'
+		read -rep 'Choose [a]ll, [i]nteractive, [s]kip: ' -n 1 response
+		[ \"\$response\" == 'a' ] || [ \"\$response\" == 'A' ] \
+			&& sed --in-place --expression 's/$find/$replace/g' {}
+		[ \"\$response\" == 'i' ] || [ \"\$response\" == 'I' ] \
+			&& nvim -c ':%s/$find/$replace/gc' {}
+		clear
+	" \;
+
+# vi: set filetype=zsh:

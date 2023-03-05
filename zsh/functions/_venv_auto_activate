@@ -1,0 +1,7 @@
+_venv_set_paths
+
+if [[ -f $VENV_ACTIVATE ]]; then
+	venvactivate
+fi
+
+# vi: set filetype=zsh:

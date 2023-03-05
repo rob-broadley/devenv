@@ -1,0 +1,21 @@
+_venv_set_paths
+
+if [ -e $VENV_DIR ]; then
+	echo "Could not create environment: one already exists!"
+else
+	echo "Creating $VENV_DIR"
+	python -m venv $VENV_DIR
+	source $VENV_ACTIVATE
+	pip install -U pip
+	if [ $# -gt 0 ]
+	then
+		for var in "$@"
+		do
+			pip install --requirement $1
+		done
+	else
+		pip install black isort mypy pydocstyle pylint
+	fi
+fi
+
+# vi: set filetype=zsh:

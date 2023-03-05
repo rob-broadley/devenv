@@ -1,0 +1,12 @@
+_venv_set_paths
+
+if [ -x $VENV_ACTIVATE ]; then
+	echo "Could not activate environment ($VENV_ACTIVATE)!"
+else
+	# Check to see if already activated to avoid redundant activating
+	if [[ "$VIRTUAL_ENV" != "$VENV_DIR" ]]; then
+		source $VENV_ACTIVATE
+	fi
+fi
+
+# vi: set filetype=zsh:

@@ -1,0 +1,4 @@
+VENV_DIR="$PWD/$VENV"
+VENV_ACTIVATE="$VENV_DIR/bin/activate"
+
+# vi: set filetype=zsh:
