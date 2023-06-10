@@ -177,7 +177,7 @@ alias ipy3='ipython3'
 alias pipi='pip install'
 alias pipu='pip uninstall'
 alias pips='pip search'
-alias pipf='pip freeze'
+alias pipl='pip list'
 # ----------------------------------------------------------------------------
 
 
