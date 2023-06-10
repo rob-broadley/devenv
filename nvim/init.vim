@@ -1,6 +1,6 @@
-" Get XDG_DATA_HOME or set to default if it doesn't exist
-let xdg_data_home = fnamemodify(
-	\ exists("$XDG_DATA_HOME") ? $XDG_DATA_HOME : '~/.local/share',
+" Get XDG_CONFIG_HOME or set to default if it doesn't exist
+let xdg_config_home = fnamemodify(
+	\ exists("$XDG_CONFIG_HOME") ? $XDG_CONFIG_HOME : '~/.config',
 	\ ':p'
 \)
 
@@ -8,7 +8,7 @@ let xdg_data_home = fnamemodify(
 let g:ale_disable_lsp = 1
 
 " Set up dein (plugins)
-let dein_dir = fnamemodify(xdg_data_home.'nvim/dein', ':p')
+let dein_dir = fnamemodify(xdg_config_home.'nvim/dein', ':p')
 "dein Scripts-----------------------------
 if &compatible
 	set nocompatible							 " Be iMproved

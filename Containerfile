@@ -80,7 +80,7 @@ COPY extras/gitstatusd-linux-x86_64 $XDG_CACHE_HOME/gitstatus/
 # Add nvim config files
 COPY nvim/init.vim $XDG_CONFIG_HOME/nvim/init.vim
 COPY nvim/coc-settings.json $XDG_CONFIG_HOME/nvim/coc-settings.json
-COPY nvim/dein.vim $XDG_DATA_HOME/nvim/dein/repos/github.com/Shougo/dein.vim
+COPY nvim/dein.vim $XDG_CONFIG_HOME/nvim/dein/repos/github.com/Shougo/dein.vim
 
 # Add editorconfig
 COPY .editorconfig $XDG_CONFIG_HOME/editorconfig
