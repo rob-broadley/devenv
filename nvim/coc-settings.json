@@ -20,7 +20,9 @@
 	"python.linting.enabled": true,  // enable additional linters.
 	"python.linting.lintOnSave": true,
 	"python.linting.mypyEnabled": true,
+	"python.linting.ruffEnabled": true,
 	"python.linting.pydocstyleEnabled": true,
 	"python.linting.pylintEnabled": true,
-	"python.linting.pylintUseMinimalCheckers": false
+	"pyright.organizeimports.provider": "isort",
+	"pyright.testing.provider": "pytest"
 }
