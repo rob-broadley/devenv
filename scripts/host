@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# SSH to host system (get hos shell).
+# SSH to host system (get host shell).
 # Change to CWD / bind source if possible.
 
 case $(readlink -f .)/ in
