@@ -49,6 +49,7 @@ RUN rm -rf /var/cache /var/log/dnf*
 
 # Add Extras using language specific package managers
 RUN npm install --global pyright
+RUN pip install --no-cache-dir --root-user-action=ignore ruff
 
 # Remove default zshrc from skel so user does not inherit it
 RUN rm -f /etc/skel/.zshrc
@@ -106,6 +107,9 @@ RUN mkdir -p $XDG_DATA_HOME/zsh
 
 # Set up symlink for editorconfig
 RUN ln -s $XDG_CONFIG_HOME/editorconfig .editorconfig
+
+# Set up ZSH auto-completions
+RUN ruff generate-shell-completion zsh > $XDG_CONFIG_HOME/zsh/functions/_ruff
 
 # Set up nvim plugins
 RUN nvim --headless -c "call dein#install()" +qa

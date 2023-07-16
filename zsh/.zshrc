@@ -29,6 +29,26 @@ source $PLUGIN_DIR/zsh-history-substring-search/zsh-history-substring-search.zsh
 
 
 # ****************************************************************************
+# Functions
+# ****************************************************************************
+fpath=($ZSH_DIR/functions $fpath)
+autoload -Uz replace
+autoload -Uz start_keychain
+autoload -Uz venvactivate
+autoload -Uz venvnew
+autoload -Uz _venv_auto_activate
+autoload -Uz _venv_set_paths
+
+# python-env (Auto activate a python virtualenv when entering the project directory)
+VENV=".venv"
+
+chpwd_functions+=(_venv_auto_activate)
+precmd_functions=(_venv_auto_activate $precmd_functions)
+# ----------------------------------------------------------------------------
+
+
+
+# ****************************************************************************
 # Config
 # ****************************************************************************
 
@@ -116,26 +136,6 @@ fi
 source $ZSH_DIR/themes/powerlevel10k/powerlevel10k.zsh-theme
 # To customize prompt, run `p10k configure` or edit $ZSH_DIR/.p10k.zsh.
 [[ ! -f $ZSH_DIR/.p10k.zsh ]] || source $ZSH_DIR/.p10k.zsh
-
-
-
-# ****************************************************************************
-# Functions
-# ****************************************************************************
-fpath=($ZSH_DIR/functions $fpath)
-autoload -Uz replace
-autoload -Uz start_keychain
-autoload -Uz venvactivate
-autoload -Uz venvnew
-autoload -Uz _venv_auto_activate
-autoload -Uz _venv_set_paths
-
-# python-env (Auto activate a python virtualenv when entering the project directory)
-VENV=".venv"
-
-chpwd_functions+=(_venv_auto_activate)
-precmd_functions=(_venv_auto_activate $precmd_functions)
-# ----------------------------------------------------------------------------
 
 
 
