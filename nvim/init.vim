@@ -26,8 +26,9 @@ if dein#load_state(dein_dir)
 	call dein#add(dein_dir . 'repos/github.com/Shougo/dein.vim')
 
 	" Visual
-	call dein#add('joshdick/onedark.vim')
-	call dein#add('itchyny/lightline.vim')
+	call dein#add('navarasu/onedark.nvim')
+	call dein#add('nvim-lualine/lualine.nvim')
+	call dein#add('nvim-treesitter/nvim-treesitter', {'hook_post_update': 'TSUpdate'})
 	call dein#add('sheerun/vim-polyglot')
 	" Editor Config
 	call dein#add('editorconfig/editorconfig-vim')
@@ -35,16 +36,17 @@ if dein#load_state(dein_dir)
 	call dein#add('w0rp/ale')
 	call dein#add('neoclide/coc.nvim', {'merged': 0, 'rev': 'release'})
 	" VCS
-	call dein#add('mhinz/vim-signify')
+	call dein#add('lewis6991/gitsigns.nvim')
 	call dein#add('tpope/vim-fugitive')
 	" Commenting
 	call dein#add('tpope/vim-commentary')
 	" For Python
-	call dein#add('numirias/semshi')
+	call dein#add('wookayin/semshi')
 	" For Pandoc / Markdown
 	call dein#add('vim-pandoc/vim-pandoc')
 	call dein#add('vim-pandoc/vim-pandoc-syntax')
-	call dein#add('junegunn/goyo.vim')
+	" For keybinding help.
+	call dein#add('folke/which-key.nvim')
 
 	" Required:
 	call dein#end()
@@ -92,47 +94,6 @@ augroup ScrollLockLED
 augroup END
 
 
-" Status Line
-set noshowmode
-let g:lightline = {
-	\ 'colorscheme': 'onedark',
-	\ 'active': {
-	\			'left': [
-	\					[ 'mode', 'paste' ],
-	\					[ 'gitbranch', 'readonly', 'filename', 'modified' ]
-	\			]
-	\ },
-	\ 'component_function': {
-	\			'gitbranch': 'fugitive#head'
-	\ },
-\}
-let g:lightline.separator = {
-	\ 'left': '', 'right': ''
-\}
-let g:lightline.subseparator = {
-	\ 'left': '', 'right': ''
-\}
-
-
-" Set colorscheme
-if (has('termguicolors'))
-	set termguicolors
-endif
-if (has("autocmd") && !has("gui_running"))
-	augroup colorset
-		autocmd!
-		let s:white = { "gui": "#ABB2BF", "cterm": "145", "cterm16" : "7" }
-		autocmd ColorScheme * call onedark#set_highlight("Normal", { "fg": s:white }) " `bg` will not be styled since there is no `bg` setting
-	augroup END
-endif
-silent! colorscheme onedark
-
-
-" Goyo
-let g:goyo_width = 100
-let g:goyo_height = '100%'
-
-
 " Completion
 " Autocomplete with dictionary words when spell check is on.
 set complete+=kspell
@@ -164,22 +125,79 @@ function! s:show_documentation()
   elseif (coc#rpc#ready())
     call CocActionAsync('doHover')
   else
-    execute '!' . &keywordprg . " " . expand('<cword>')
+    execute '!' . &keywordprg . ' ' . expand('<cword>')
   endif
 endfunction
 " Key bindings.
-" Show code action menu
+" Show code action menu.
 nmap <silent> ca <Plug>(coc-codeaction-line)
 " Go to definition and references.
 nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gr <Plug>(coc-references)
+" Go to issues.
+nmap <silent> ]l <Plug>(coc-diagnostic-next)
+nmap <silent> [l <Plug>(coc-diagnostic-prev)
+
 " Rename with F2.
 nmap <F2> <Plug>(coc-rename)
 " Auto-format with leader f.
 nmap <Leader>f <Plug>(ale_fix)
-" Use H to show documentation in preview window.
-nnoremap <silent> H :call <SID>show_documentation()<CR>
+" Use K to show documentation in preview window.
+nnoremap <silent> K :call <SID>show_documentation()<CR>
 
 
 " Python Setup
 let g:python_highlight_all = 1
+
+
+lua <<EOF
+
+-- If running headless, skip setup.
+if next(vim.api.nvim_list_uis()) == nil then
+	return
+end
+
+-- Theme.
+require('onedark').setup {
+    style = 'warmer',
+    transparent = true,
+    code_style = {
+      comments = 'none',
+    },
+    highlights = {
+      DiffAdd = {bg = '#273327'},
+      DiffChange = {bg = '#262733'},
+      DiffDelete = {bg = '#332727'},
+      DiffText = {bg = '#3a3b4c'},
+      SpellBad = {fg = '$red'},
+      TODO = {fg = '$orange', fmt = 'bold'},
+    },
+}
+require('onedark').load()
+
+-- Status Line.
+require('lualine').setup {
+	options = {
+		theme = 'onedark',
+	},
+}
+
+-- Improved syntax highlighting.
+require('nvim-treesitter.configs').setup {
+	highlight = {
+		enable = true,
+	},
+  indent = {
+		enable = true,
+	},
+}
+
+-- Git decorations.
+require('gitsigns').setup {}
+
+-- Keybinding help.
+local wk = require('which-key')
+wk.register(mappings, opts)
+
+EOF
+" End of lua block.
