@@ -159,19 +159,19 @@ end
 
 -- Theme.
 require('onedark').setup {
-    style = 'warmer',
-    transparent = true,
-    code_style = {
-      comments = 'none',
-    },
-    highlights = {
-      DiffAdd = {bg = '#273327'},
-      DiffChange = {bg = '#262733'},
-      DiffDelete = {bg = '#332727'},
-      DiffText = {bg = '#3a3b4c'},
-      SpellBad = {fg = '$red'},
-      TODO = {fg = '$orange', fmt = 'bold'},
-    },
+	style = 'warmer',
+	transparent = true,
+	code_style = {
+		comments = 'none',
+	},
+	highlights = {
+		DiffAdd = {bg = '#273327'},
+		DiffChange = {bg = '#262733'},
+		DiffDelete = {bg = '#332727'},
+		DiffText = {bg = '#3a3b4c'},
+		SpellBad = {fg = '$red'},
+		TODO = {fg = '$orange', fmt = 'bold'},
+	},
 }
 require('onedark').load()
 
@@ -179,6 +179,25 @@ require('onedark').load()
 require('lualine').setup {
 	options = {
 		theme = 'onedark',
+	},
+	sections = {
+		lualine_b = {
+			{
+				'branch',
+				fmt = function(str)
+					-- Remove branch prefix (any letters up to and including 1st '/').
+					str = str:gsub('^%a+%/', '')
+					-- Limit branch to 10 chars, unless diff mode, then 30.
+          local max = 10
+					if vim.api.nvim_win_get_option(0, 'diff') then
+						max = 30
+          end
+          return str:sub(0, max)
+				end
+			},
+      'diff',
+      'diagnostics',
+		},
 	},
 }
 
