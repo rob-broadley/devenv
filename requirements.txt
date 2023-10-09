@@ -26,7 +26,7 @@ poppler-utils odt2txt
 # For ranger preview of media info
 mediainfo
 # For containers
-docker docker-compose
+docker docker-compose moby-engine-zsh-completion
 # Compliers
 gcc g++
 # Build tools
