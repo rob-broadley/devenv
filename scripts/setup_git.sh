@@ -24,11 +24,13 @@ fi
 git config --global blame.coloring highlightRecent
 git config --global diff.colorMoved zebra
 git config --global diff.tool nvimdiff
+git config --global init.defaultBranch main
 git config --global log.date auto:relative
 git config --global merge.log true
 git config --global merge.tool nvimdiff
 git config --global pull.rebase true
-git config --global rebase.autosquash true
+git config --global rebase.autoSquash true
+git config --global rebase.autoStash true
 
 # Aliases
 git config --global alias.aliases "config --get-regexp '^alias\\.'"
