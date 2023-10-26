@@ -54,7 +54,7 @@ RUN pip install --no-cache-dir --root-user-action=ignore ruff
 RUN rm -f /etc/skel/.zshrc
 
 # Creating user without password and with root privileges.
-RUN adduser --groups wheel,docker "$USER"
+RUN adduser --groups wheel,docker --shell /bin/zsh "$USER"
 
 # Give password-less sudo. This is only acceptable as it is a private
 # development environment not exposed to the outside world.
