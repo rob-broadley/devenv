@@ -42,10 +42,9 @@ RUN dnf update -y
 # Get list of required packages
 # Lines are joined by a space, Lines beginning with # are ignored
 COPY requirements.txt /tmp/requirements.txt
-# Add Packages
-RUN dnf install -y $(grep -v '^#' /tmp/requirements.txt | tr "\n" " ")
-# Remove directories used by dnf that are just taking up space
-RUN rm -rf /var/cache /var/log/dnf*
+# Add Packages and remove directories used by dnf that are just taking up space
+RUN dnf install -y $(grep -v '^#' /tmp/requirements.txt | tr "\n" " ") \
+    && rm -rf /var/cache /var/log/dnf*
 
 # Add Extras using language specific package managers
 RUN npm install --global pyright
