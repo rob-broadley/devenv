@@ -33,7 +33,7 @@ source $PLUGIN_DIR/zsh-history-substring-search/zsh-history-substring-search.zsh
 # ****************************************************************************
 fpath=($ZSH_DIR/functions $fpath)
 autoload -Uz replace
-autoload -Uz start_keychain
+autoload -Uz start-keychain
 autoload -Uz venvactivate
 autoload -Uz venvnew
 autoload -Uz _venv_auto_activate

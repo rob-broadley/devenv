@@ -1,0 +1,4 @@
+keychain --dir "$KEYCHAIN_DIR" --inherit any-once --quick --quiet id_ed25519
+source $KEYCHAIN_DIR/$HOSTNAME-sh
+
+# vi: set filetype=zsh:
