@@ -1,8 +1,7 @@
 #!/bin/sh
 
 # Set defaults
-DISTRO=${DISTRO:-fedora}
-PKG_INSTALL=${PKG_INSTALL:-"sudo dnf install -y"}
+PKG_INSTALL=${PKG_INSTALL:-"sudo zypper install --no-confirm"}
 
 # Get parent of directory which contains this script
 if [ -L $0 ]
@@ -44,8 +43,6 @@ EOF
 # Ensure environment variables are set in .profile
 insert "# Add environment variables to ~.profile"
 source "$BUILDSCRIPTS/env_var_to_profile.sh" >> $OUTPUT
-sed -i '/ensure_line_in_file "export DISTRO/d' $OUTPUT
-insert "ensure_line_in_file \"export DISTRO=$DISTRO\" ~/.profile"
 insert "source ~/.profile"
 
 insert ""

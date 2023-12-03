@@ -1,0 +1,57 @@
+__usage="
+Usage: $(basename $0) [OPTIONS] [APPLICATION]
+------------------------------------------------------------------------------
+Options:
+  -d, --delete                 Delete the link.
+  -h, --help                   Show this help and exit.
+
+Example:
+  $(basename $0) podman
+  $(basename $0) -d podman
+  $(basename $0) --delete podman
+"
+
+USER_BIN=$HOME/.local/bin
+
+# Process CLI args.
+nopts=$#
+if [ $nopts -gt 0 ]
+then
+	zparseopts -D -E -F - \
+		d=delete -delete=delete \
+		h=help -help=help \
+		|| (echo "Error parsing args" && return 1)
+
+	delete=${#delete}
+	help=${#help}
+fi
+
+host_app=$1
+
+# If no CLI args or help arg given, show help and exit.
+if [ $nopts -eq 0 ] || [ $help -gt 0 ]
+then
+	echo $__usage
+	return 0
+fi
+
+# If delete arg given, then delete symlink, else create it.
+if [ $delete -gt 0 ]
+then
+	rm $USER_BIN/$host_app
+else
+	# Check app exists on host and raise error if not (courtesy of which).
+	output="$(distrobox-host-exec which "$host_app" 2>&1)"
+	return_code=$?
+	if [ $return_code -ne 0 ]
+	then
+		printf >&2 "\033[31m%s\033[0m\n" "${output}"
+		return $code
+	fi
+	# Make sure user bin directory exits.
+	mkdir -p $USER_BIN
+	# Create symlink
+	ln -s "$(which distrobox-host-exec)" $USER_BIN/$host_app
+fi
+
+# vi: set filetype=zsh:
