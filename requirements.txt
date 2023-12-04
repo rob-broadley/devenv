@@ -31,5 +31,7 @@ python311 python311-devel python311-ipython
 iproute2 net-tools
 # POSIX tools otherwise not installed
 awk
+# Data manipulation
+jq
 # Other utilities
 htop wl-clipboard
