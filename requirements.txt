@@ -26,7 +26,7 @@ docker docker-compose docker-zsh-completion
 gcc gcc-c++
 # For development
 npm-default
-python311 python311-devel python311-ipython
+python311 python311-devel python311-ipython python311-pip
 # IP Tools
 iproute2 net-tools
 # POSIX tools otherwise not installed
