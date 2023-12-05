@@ -30,7 +30,7 @@ python311 python311-devel python311-ipython
 # IP Tools
 iproute2 net-tools
 # POSIX tools otherwise not installed
-awk
+gawk
 # Data manipulation
 jq
 # Other utilities
