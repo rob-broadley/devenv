@@ -199,6 +199,6 @@ alias vi='nvim'
 alias vimdiff='nvim -d'
 
 # tmux
-alias tmux0='tmux new-session -A -s 0'
-alias tmux-dev='tmux new-session -A -s dev'
+alias tmux0='tmux new-session -A -s 0 -c $(pwd)'
+alias tmux-dev='tmux new-session -A -s dev -c $(pwd)'
 # --------------------------------------------------------------------------------------
