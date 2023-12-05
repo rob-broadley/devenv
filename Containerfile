@@ -19,6 +19,7 @@ RUN --mount=type=cache,target=/var/cache \
     zypper refresh \
     && zypper install --no-recommends --no-confirm $(grep -v '^#' /tmp/requirements.txt | tr "\n" " ") \
     && npm install --global --cache=/var/cache/npm pyright \
+    && ln --symbolic $(which python3) /usr/local/bin/python \
     && ruff generate-shell-completion zsh > usr/share/zsh/site-functions/_ruff
 
 # Add useful scripts
