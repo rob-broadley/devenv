@@ -2,6 +2,7 @@ __usage="
 Usage: $(basename $0) [OPTIONS] [APPLICATION]
 ------------------------------------------------------------------------------
 Options:
+  -f, --force                  Remove existing files.
   -d, --delete                 Delete the link.
   -h, --help                   Show this help and exit.
 
@@ -18,11 +19,13 @@ nopts=$#
 if [ $nopts -gt 0 ]
 then
 	zparseopts -D -E -F - \
+		f=force -force=force \
 		d=delete -delete=delete \
 		h=help -help=help \
 		|| (echo "Error parsing args" && return 1)
 
 	delete=${#delete}
+	force=${#force}
 	help=${#help}
 fi
 
@@ -46,12 +49,18 @@ else
 	if [ $return_code -ne 0 ]
 	then
 		printf >&2 "\033[31m%s\033[0m\n" "${output}"
-		return $code
+		return $return_code
 	fi
 	# Make sure user bin directory exits.
 	mkdir -p $USER_BIN
 	# Create symlink
-	ln -s "$(which distrobox-host-exec)" $USER_BIN/$host_app
+	if [ $force -gt 0 ]
+	then
+		flags='--force'
+	else
+		flags=''
+	fi
+	ln --symbolic $flags "$(which distrobox-host-exec)" $USER_BIN/$host_app
 fi
 
 # vi: set filetype=zsh:

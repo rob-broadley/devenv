@@ -37,4 +37,23 @@ printf "%-40s\t" "Setting up neovim..."
 output=$(nvim --headless -c ":CocInstall -sync coc-json" +qa 2>&1)
 handle_status_code $? "$output"
 
+# Set up app passthrough.
+printf "%-40s\t" "Setting up application passthroughs..."
+output=$(
+	zsh -c '
+		declare -i RESULT=0
+		autoload -Uz app-passthrough
+		RESULT+=$?
+		app-passthrough --force xdg-open
+		RESULT+=$?
+		app-passthrough --force podman
+		RESULT+=$?
+		app-passthrough --force distrobox
+		RESULT+=$?
+		exit $RESULT
+	' \
+	2>&1
+)
+handle_status_code $? "$output"
+
 printf "\n\033[32m%s\033[0m\n\n" "Success"
