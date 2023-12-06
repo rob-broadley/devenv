@@ -96,9 +96,17 @@ nnoremap <C-_> :Commentary<cr>
 " Linting, completion and auto-format.
 let g:ale_linters = {'python': []}  " Disable python linters (using coc-pyright instead)
 let g:ale_fixers = {
-	\	'*': ['remove_trailing_lines', 'trim_whitespace'],
-	\ 'python': ['black', 'isort'],
+	\ '*': ['remove_trailing_lines', 'trim_whitespace'],
+	\ 'python': ['black', 'ruff'],
 \}
+" Set ruff to only fix import sorting not other auto-fixes
+" (note ruff_format not enabled).
+augroup PythonRuffFixer
+  autocmd!
+  autocmd User ALEFixPre  let b:ale_python_ruff_options = '--select=I'
+  autocmd User ALEFixPost let b:ale_python_ruff_options = ''
+augroup END
+" Set when to lint.
 let g:ale_lint_on_insert_leave = 1
 let g:ale_lint_on_text_changed = 0
 let g:ale_completion_enabled = 1

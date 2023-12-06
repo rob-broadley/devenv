@@ -21,7 +21,6 @@
 	"python.linting.lintOnSave": true,
 	"python.linting.mypyEnabled": true,
 	"python.linting.ruffEnabled": true,
-	"python.linting.pydocstyleEnabled": true,
 	"python.linting.pylintEnabled": true,
 	"pyright.organizeimports.provider": "ruff",
 	"pyright.testing.provider": "pytest"
