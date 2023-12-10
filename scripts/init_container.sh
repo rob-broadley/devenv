@@ -29,7 +29,7 @@ output="$(sudo zypper refresh 2>&1)"
 handle_status_code $? "$output"
 
 printf "%-40s\t" "Update installed packages..."
-output=$(sudo zypper update --no-confirm 2>&1)
+output=$(sudo zypper dist-upgrade --no-confirm 2>&1)
 handle_status_code $? "$output"
 
 # Install Nvim and Coc Plugins (By running vim lazy.nvim will do installs).
