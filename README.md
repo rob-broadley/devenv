@@ -1,25 +1,28 @@
 # Development Environment
 A set up for a development environment centred on tmux (terminal multiplexer), zsh (shell), neovim (text editor), ranger (file manager).
-Other handy utilities are also included, see requirements.txt for the packages added to a Fedora base.
+Other handy utilities are also included, see requirements.txt for the packages added to an openSUSE Tumbleweed base.
 
 ![Shell Screenshot](screenshots/shell.png)
 
 
 
-## As a Container
-The development environment can be run as a container.
-The tested approach is to use docker-compose.
-To build the container image run: `make image`.
-To start a container from the created image run `make container`.
+## Using Distrobox
+The image can be built using `./build image`.
+To create the distrobox container `./build container`.
 
+Note: `./build` is equivalent to `./build image container`.
 
-For easy starting from any directory run `make bin` to put `devenv` in `~/.local/bin`.
-A container can then be started by calling `devenv`.
-`devenv` is a soft link to the script called by `make container`.
+To enter the distrobox container run `./build enter`, `distrobox enter devenv`,
+or launch it from the system application launcher.
 
+The devenv's home directory is a `devenv` directory in the host user's home directory.
+The host users home directory will also be accessible if needed,
+it will be mounted in the container at the same path as on the host machine.
 
-If running as above (without any modifications to the docker compose file), then only two locations will be persistent (attached volumes) /home/developer/projects (for your work) and /home/developer/.local/share (for application data).
-The host users home directory will also be accessible if needed, it will be mounted in the same location as on the host machine.
+If files from the host user's home need to be shared with the container user,
+a symbolic link should be used.
+For example, from inside the container run `ln --symbolic $DISTROBOX_HOST_HOME/.config/git ~/.config/`
+to share git configuration.
 
 
 
@@ -38,12 +41,6 @@ The default WSL distribution can be set to devenv using `wsl --setdefault devenv
 
 If using Windows Terminal set the `command line` option in settings to `wsl --distribution devenv zsh --login` for zsh on start up,
 or `wsl --distribution devenv tmux new-session -A -s dev` for tmux on start up.
-
-
-
-## Local Install (Unmaintained)
-A script to set up the environment for the local user can be produced from the container definition file (Containerfile) by running `make install.sh`.
-The produced `install.sh` script should work for recent versions of Fedora, but may need modifying for other distributions / operating systems.
 
 
 
