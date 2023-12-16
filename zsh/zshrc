@@ -2,11 +2,12 @@
 # Set up paths
 # **************************************************************************************
 ZSH_DIR=${XDG_CONFIG_HOME:-$HOME/.config}/zsh
-ZSH_SITE_DATA=/usr/local/share/zsh
-ZSH_PLUGIN_DIR=$ZSH_SITE_DATA/site-plugins
-ZSH_THEME_DIR=$ZSH_SITE_DATA/site-themes
-ZSH_DATA=$HOME/.local/share/zsh
-XDG_CACHE_HOME=${XDG_CACHE_HOME:-$HOME/.cache}
+export ZSH_SITE_DATA=/usr/local/share/zsh
+export ZSH_SITE_PLUGIN_DIR=$ZSH_SITE_DATA/site-plugins
+export ZSH_SITE_THEME_DIR=$ZSH_SITE_DATA/site-themes
+export ZSH_SITE_CONFIG_DIR=$ZSH_SITE_DATA/site-config
+export ZSH_DATA=$HOME/.local/share/zsh
+export XDG_CACHE_HOME=${XDG_CACHE_HOME:-$HOME/.cache}
 
 
 # **************************************************************************************
@@ -24,8 +25,8 @@ fi
 # **************************************************************************************
 # Plugins
 # **************************************************************************************
-source $ZSH_PLUGIN_DIR/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-source $ZSH_PLUGIN_DIR/zsh-history-substring-search/zsh-history-substring-search.zsh
+source $ZSH_SITE_PLUGIN_DIR/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source $ZSH_SITE_PLUGIN_DIR/zsh-history-substring-search/zsh-history-substring-search.zsh
 
 
 
@@ -140,7 +141,7 @@ fi
 # **************************************************************************************
 # Theme
 # **************************************************************************************
-source $ZSH_THEME_DIR/powerlevel10k/powerlevel10k.zsh-theme
+source $ZSH_SITE_THEME_DIR/powerlevel10k/powerlevel10k.zsh-theme
 # To customize prompt, run `p10k configure` or edit /etc/p10k.zsh.
 [[ ! -f /etc/p10k.zsh ]] || source /etc/p10k.zsh
 
@@ -202,3 +203,14 @@ alias vimdiff='nvim -d'
 alias tmux0='tmux new-session -A -s 0 -c $(pwd)'
 alias tmux-dev='tmux new-session -A -s dev -c $(pwd)'
 # --------------------------------------------------------------------------------------
+
+
+
+# **************************************************************************************
+# Load Site Configuration
+# **************************************************************************************
+if [ -d $ZSH_SITE_CONFIG_DIR ]; then
+	for file in $ZSH_SITE_CONFIG_DIR/*.zsh; do
+		source "$file"
+	done
+fi

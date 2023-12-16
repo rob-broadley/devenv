@@ -33,7 +33,7 @@ COPY tmux/.tmux.conf /etc/tmux.conf
 COPY tmux/.tmux.conf.local /etc/tmux.conf.local
 
 # Add zsh config files
-COPY --chown=root:root --chmod=755 zsh/functions /usr/local/share/zsh/site-functions
+COPY --chown=root:root --chmod=644 zsh/functions /usr/local/share/zsh/site-functions
 
 COPY zsh/plugins/zsh-history-substring-search/zsh* \
     /usr/local/share/zsh/site-plugins/zsh-history-substring-search/
