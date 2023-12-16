@@ -56,7 +56,7 @@ require("lazy").setup({
 	-- Editor Config.
 	"editorconfig/editorconfig-vim",
 	-- Linting and completion and auto-format.
-	"w0rp/ale",
+	"dense-analysis/ale",
 	{"neoclide/coc.nvim", branch = "release"},
 	-- VCS.
 	"lewis6991/gitsigns.nvim",
