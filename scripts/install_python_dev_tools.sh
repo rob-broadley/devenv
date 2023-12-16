@@ -15,3 +15,9 @@ printf "Installing: %s\n" "$installs"
 
 # Install the packages.
 sudo zypper install --no-confirm $installs
+
+# Set up invoke auto-completion.
+sudo mkdir -p $ZSH_SITE_CONFIG_DIR
+invoke --print-completion-script=zsh \
+	| sudo tee $ZSH_SITE_CONFIG_DIR/_complete_invoke.zsh \
+	> /dev/null

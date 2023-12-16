@@ -12,7 +12,7 @@ EOF
 # Install extensions:
 # - One Dark Theme
 code \
-  --install-extension zhuangtongfa.material-theme
+	--install-extension zhuangtongfa.material-theme
 
 # Configure VSCode for calling user.
 printf "Configuring VSCode...\n"
@@ -24,33 +24,33 @@ settings_json=$(cat $VSCODE_SETTINGS_FILE 2> /dev/null)
 # If not empty, update values for settings of interest.
 if [ -z "$settings_json" ]
 then
-  settings_json="{}"
+	settings_json="{}"
 fi
 new_settings=$(
-  echo $settings_json \
-  | jq \
-  --tab \
-  --sort-keys \
-  --arg titlebarstyle custom \
-  --arg fontfamily "'Symbols Nerd Font', 'DejaVu Sans Mono', 'monospace', monospace" \
-  --arg fontsize 12 \
-  --arg theme "One Dark Pro" \
-  '."window.titleBarStyle"|=$titlebarstyle
-   | ."editor.fontFamily"|=$fontfamily
-   | ."editor.fontSize"|=($fontsize|tonumber)
-   | ."terminal.integrated.fontSize"|=($fontsize|tonumber)
-   | ."workbench.colorTheme"|=$theme
-  '
+	echo $settings_json \
+	| jq \
+	--tab \
+	--sort-keys \
+	--arg titlebarstyle custom \
+	--arg fontfamily "'Symbols Nerd Font', 'DejaVu Sans Mono', 'monospace', monospace" \
+	--arg fontsize 12 \
+	--arg theme "One Dark Pro" \
+	'."window.titleBarStyle"|=$titlebarstyle
+	 | ."editor.fontFamily"|=$fontfamily
+	 | ."editor.fontSize"|=($fontsize|tonumber)
+	 | ."terminal.integrated.fontSize"|=($fontsize|tonumber)
+	 | ."workbench.colorTheme"|=$theme
+	'
 )
 # If settings modified successfully write to file, else exit with error.
 return_code=$?
 if [ $return_code -eq 0 ]
 then
-  mkdir --parents $(dirname $VSCODE_SETTINGS_FILE)
-  echo "$new_settings" > $VSCODE_SETTINGS_FILE
+	mkdir --parents $(dirname $VSCODE_SETTINGS_FILE)
+	echo "$new_settings" > $VSCODE_SETTINGS_FILE
 else
-  printf "\033[31mERROR\033[0m\n"
-  exit $return_code
+	printf "\033[31mERROR\033[0m\n"
+	exit $return_code
 fi
 
 printf "Adding alias which enables wayland support...\n"
