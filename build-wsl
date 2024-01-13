@@ -57,10 +57,6 @@ do
 	echo ensure_line_in_file \"$setvarline\" /etc/profile.local >> $LOCAL_MODS
 done <<< "$ENVS"
 
-# Make Home and End keys work in WSL / Windows Terminal.
-printf "\n%s\n" 'ensure_line_in_file "bind -n Home send Escape \"OH\"" /etc/tmux.conf.local' >> $LOCAL_MODS
-printf "%s\n\n" 'ensure_line_in_file "bind -n End send Escape \"OF\"" /etc/tmux.conf.local' >> $LOCAL_MODS
-
 # Give password-less sudo. This is only acceptable as it is a private
 # development environment not exposed to the outside world.
 # Do NOT do this on your host machine or otherwise.
