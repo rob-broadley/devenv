@@ -37,9 +37,8 @@ ensure_line_in_file () {
 echo [boot] >> /etc/wsl.conf
 echo systemd=true >> /etc/wsl.conf
 
-# Shell / Environment configuration.
+# Set up environment variables.
 touch /etc/profile.local
-
 EOF
 
 # Extract environment variables from Containerfile
@@ -50,17 +49,20 @@ ENVS=$(\
 	awk 'BEGIN {FPAT = "([^ ]+)|(\"[^\"]+\")"} /^ENV/{ gsub(/"/, "\\\"", $3); gsub(/\$/, "\\$", $3); print $2"="$3; }' $containerfile
 )
 
-# Output commands to ensure environment variables defined in ~/.profile
+# Output commands to ensure environment variables defined in /etc/profile.local
 while IFS= read -r line
 do
 	setvarline="export $line"
 	echo ensure_line_in_file \"$setvarline\" /etc/profile.local >> $LOCAL_MODS
 done <<< "$ENVS"
 
+echo ensure_line_in_file \"export BROWSER=/mnt/c/Windows/explorer.exe\" /etc/profile.local >> $LOCAL_MODS
+
 # Give password-less sudo. This is only acceptable as it is a private
 # development environment not exposed to the outside world.
 # Do NOT do this on your host machine or otherwise.
-printf %"s\n" 'echo "%wheel ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers' >> $LOCAL_MODS
+printf "\n%s\n" '# Set sudo to not require a password.' >> $LOCAL_MODS
+printf "%s\n" 'echo "%wheel ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers' >> $LOCAL_MODS
 
 chmod +x $LOCAL_MODS
 
