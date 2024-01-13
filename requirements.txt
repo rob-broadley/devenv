@@ -7,7 +7,7 @@ neovim
 # File manager
 ranger
 # Version control
-git
+git gh
 # For nvim
 python3-neovim
 # To set editor settings
