@@ -34,13 +34,36 @@ If the host is Mac OS you may need to add `IgnoreUnknown UseKeychain` to `~/.ssh
 
 
 ## WSL Install
-To build the image (devenv.tar) run `make image` followed by `make wsl`.
+To build the image (devenv.tar) run `./build image wsl` on a machine with `podman` installed.
+
+Note: an openSUSE Tubleweed WSL image, which can be used for the build, is available in the Microsoft store.
+
 The image can be imported into WSL using `wsl --import devenv (install location) (path to devenv.tar)`.
 
+
+### First Run
+From powershell run: `wsl --distribution devenv`,
+then once inside WSL run `initial-setup` and follow the instructions.
+
+Once the initial-setup script is complete, run `exit` to return to powershell.
+
+Next you must terminate the WSL distribution with `wsl --terminate devenv`.
+
+When you next enter the devenv WSL distribution it will be ready for use.
+
+
+### Optional Steps
 The default WSL distribution can be set to devenv using `wsl --setdefault devenv`.
 
-If using Windows Terminal set the `command line` option in settings to `wsl --distribution devenv zsh --login` for zsh on start up,
-or `wsl --distribution devenv tmux new-session -A -s dev` for tmux on start up.
+If using Windows Terminal set the `command line` option in settings to
+`wsl --distribution devenv tmux new-session -A -s dev` for tmux on start up.
+
+
+
+## Include Scripts
+- setup_git.sh: configure git with user info and some customisation.
+- install_python_dev_tools.sh: installs common Python development tools, including recent Python versions.
+- install_vscode.sh: installs VSCode inside the running distrobox and exposes it to the host.
 
 
 
@@ -48,7 +71,6 @@ or `wsl --distribution devenv tmux new-session -A -s dev` for tmux on start up.
 
 ### Fonts
 Nerd fonts are recommended to get the most from zsh theme, see [here](https://www.nerdfonts.com/).
-
 
 
 ### Terminal Colors
