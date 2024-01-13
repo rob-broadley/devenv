@@ -28,6 +28,7 @@ Stages:
 	image:          build container image
 	container:      create and initialise container
 	enter:          enter the container
+	wsl:            build a WSL image
 
 Options:
 
@@ -46,6 +47,7 @@ else
 	container=0
 fi
 enter=0
+wsl=0
 dryrun=0
 
 # Parse arguments
@@ -61,6 +63,10 @@ while :; do
 			;;
 		enter)
 			enter=1
+			shift
+			;;
+		wsl)
+			wsl=1
 			shift
 			;;
 		-d | --dryrun)
@@ -117,6 +123,10 @@ fi
 
 if [ "${enter}" -ne 0 ]; then
 	cmd+=("distrobox enter ${name}")
+fi
+
+if [ "${wsl}" -ne 0 ]; then
+	cmd+=("./build-wsl $name")
 fi
 
 # Join elements of array (commands) with "  && " before command and newline after.
