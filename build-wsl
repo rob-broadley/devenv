@@ -33,9 +33,25 @@ ensure_line_in_file () {
 	grep -qF "$1" "$2" || ( echo "$1" >> "$2" && return 10 )
 }
 
-# Enable systemd.
-echo [boot] >> /etc/wsl.conf
-echo systemd=true >> /etc/wsl.conf
+unlink_wsl_conf () {
+	if [ -L $wsl_conf ]
+	then
+		actual_file=$(realpath $wsl_conf)
+		rm --force $wsl_conf
+		cp $actual_file $wsl_conf
+	fi
+}
+
+# Install WSL compatability packages.
+# The patterns-wsl packages make the wsl conf file a symlink,
+# but also complain if the wsl conf file is a symlink.
+# To work around this each is installed separately and the wsl conf
+# symlink is replaced by the file it points to.
+wsl_conf=/etc/wsl.conf
+zypper install --no-recommends --no-confirm aaa_base-wsl patterns-wsl-base
+unlink_wsl_conf $wsl_conf
+zypper install --no-recommends --no-confirm patterns-wsl-systemd
+unlink_wsl_conf $wsl_conf
 
 # Set up environment variables.
 touch /etc/profile.local
