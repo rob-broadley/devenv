@@ -52,6 +52,9 @@ zypper install --no-recommends --no-confirm aaa_base-wsl patterns-wsl-base
 unlink_wsl_conf $wsl_conf
 zypper install --no-recommends --no-confirm patterns-wsl-systemd
 unlink_wsl_conf $wsl_conf
+# Install password-store (pass), required by rancher/docker desktop.
+# Devcontainer builds fail to pull images without this.
+zypper install --no-recommends --no-confirm password-store
 
 # Set up environment variables.
 touch /etc/profile.local
@@ -102,7 +105,7 @@ echo [user] >> /etc/wsl.conf
 echo default=$user >> /etc/wsl.conf
 
 # Upgrade OS.
-echo "\n\nUpgrading OS..."
+printf "\n\nUpgrading OS..."
 zypper dist-upgrade
 
 EOF
