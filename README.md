@@ -42,12 +42,11 @@ The image can be imported into WSL using `wsl --import devenv (install location)
 
 
 ### First Run
-From powershell run: `wsl --distribution devenv`,
-then once inside WSL run `initial-setup` and follow the instructions.
-
-Once the initial-setup script is complete, run `exit` to return to powershell.
-
-Next you must terminate the WSL distribution with `wsl --terminate devenv`.
+To perform the required initial setup:
+- From powershell run: `wsl --distribution devenv`.
+- Once inside WSL run `initial-setup` and follow the instructions.
+- `exit` to return to powershell.
+- Terminate the WSL distribution with `wsl --terminate devenv`.
 
 When you next enter the devenv WSL distribution it will be ready for use.
 
@@ -59,8 +58,26 @@ If using Windows Terminal set the `command line` option in settings to
 `wsl --distribution devenv tmux new-session -A -s dev` for tmux on start up.
 
 
+### Backup and Restore
+An archive of the WSL distribution's file system can be created with:
+`wsl --export devenv devenv_backup.tar`.
+This archive will include any keys, tokens, passwords, etc. which are stored,
+so make sure to store it securely.
 
-## Include Scripts
+The backup can be imported with: `wsl --import devenv devenv devenv_backup.tar`.
+If replacing a broken WSL distribution (rather than migrating to a new machine),
+you may first have to remove the old one:
+`wsl --terminate devenv; wsl --unregister devenv`,
+then rename the install directory for that distribution.
+
+
+
+## Maintenance
+Periodic OS updates should be performed using `sudo zypper dup` (`dup` is short for `dist-upgrade`).
+
+
+
+## Included Scripts
 - setup_git.sh: configure git with user info and some customisation.
 - install_python_dev_tools.sh: installs common Python development tools, including recent Python versions.
 - install_vscode.sh: installs VSCode inside the running distrobox and exposes it to the host.
