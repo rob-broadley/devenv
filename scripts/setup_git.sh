@@ -12,13 +12,25 @@ then
 	read -p "Generate key (y/n)? " generate
 	if [ $generate = "y" ]
 	then
-		gpg --quick-gen-key "$name (Git GPG key) <$email>" default default none
+		uid="$name (Git) <$email>"
+		gpg --quick-generate-key "$uid" default default none
+		fpr=$(gpg --list-options show-only-fpr-mbox --list-keys "$uid" | awk '{print $1}')
+		echo "Generated key with fingerprint: $fpr"
+		gpg --quick-add-key $fpr default sign
+		key=$(\
+			gpg --list-secret-keys --with-colons "$uid" \
+			| awk {'FS=":"; if ($1 == "ssb" && $2 == "u" && $12 == "s") {print $5} }' \
+			| head -n 1\
+		)
+		echo "Generated signing subkey with ID: $key"
+	else
+		printf "\nAvailable Keys:\n===============\n"
+		gpg --keyid-format LONG --list-secret-keys
+		read -p "Enter signing key: " key
 	fi
-	printf "\nAvailable Keys:\n===============\n"
-	gpg --list-keys
-	read -p "Enter signing key: " key
-	git config --global user.signingkey "$key"
-	git config --global commit.gpgsign true
+	git config --global user.signingKey "$key"
+	git config --global commit.gpgSign true
+	git config --global tag.gpgSign true
 fi
 
 git config --global blame.coloring highlightRecent
@@ -45,4 +57,12 @@ git config --global alias.tree-detailed "log --graph --all"
 
 printf "\nYour global git configuration"
 printf "\n=============================\n"
-git config --global --list
+git --no-pager config --global --list
+
+
+if [ $sign = "y" ]
+then
+	printf "\n\nYour Public GPG Key"
+	printf "\n===================\n"
+	gpg --export --armour $key
+fi

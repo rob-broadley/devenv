@@ -1,2 +1,3 @@
+# set global options for all zsh shells here
 export ZDOTDIR="${XDG_CONFIG_HOME:-$HOME/.config}/zsh"
 export PATH=$HOME/.local/bin:$PATH

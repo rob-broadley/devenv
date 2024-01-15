@@ -1,0 +1,143 @@
+#!/bin/sh
+
+name="${1:-devenv}"
+LOCAL_MODS="tmp_image_mod.sh"
+CONTAINER_MODS="/tmp/setup.sh"
+LOCAL_INIT="tmp_inital_setup.sh"
+CONTAINER_INIT="/usr/local/bin/initial-setup"
+PROFILE_FILE="/etc/profile.local"
+repo="$(realpath $(dirname "$0"))"
+containerfile="${repo}/Containerfile"
+
+
+# =====================================================================================
+# Get container image to use.
+# =====================================================================================
+# Use the last created devenv image.
+image=$(podman images --format '{{.Repository}}:{{.Tag}}' $name | head -n 1)
+if [ -z "$image" ]
+then
+	echo "Error: no image for ${name}"
+	exit 1
+fi
+echo "Using image: $image"
+
+
+# =====================================================================================
+# Create pre-export setup script.
+# =====================================================================================
+cat > $LOCAL_MODS <<'EOF'
+#!/bin/sh
+
+ensure_line_in_file () {
+	grep -qF "$1" "$2" || ( echo "$1" >> "$2" && return 10 )
+}
+
+unlink_wsl_conf () {
+	if [ -L $wsl_conf ]
+	then
+		actual_file=$(realpath $wsl_conf)
+		rm --force $wsl_conf
+		cp $actual_file $wsl_conf
+	fi
+}
+
+# Install WSL compatability packages.
+# The patterns-wsl packages make the wsl conf file a symlink,
+# but also complain if the wsl conf file is a symlink.
+# To work around this each is installed separately and the wsl conf
+# symlink is replaced by the file it points to.
+wsl_conf=/etc/wsl.conf
+zypper install --no-recommends --no-confirm aaa_base-wsl patterns-wsl-base
+unlink_wsl_conf $wsl_conf
+zypper install --no-recommends --no-confirm patterns-wsl-systemd
+unlink_wsl_conf $wsl_conf
+# Install password-store (pass), required by rancher/docker desktop.
+# Devcontainer builds fail to pull images without this.
+zypper install --no-recommends --no-confirm password-store
+
+# Set up environment variables.
+touch /etc/profile.local
+EOF
+
+# Extract environment variables from Containerfile
+# Separate on lines beginning with ENV on white space but not if inside quotes.
+# Output string {2nd column}={3rd column} e.g. ENV EDITOR nvim > EDITOR=nvim
+# Substitute " for \" in variable value (escape the " char)
+ENVS=$(\
+	awk 'BEGIN {FPAT = "([^ ]+)|(\"[^\"]+\")"} /^ENV/{ gsub(/"/, "\\\"", $3); gsub(/\$/, "\\$", $3); print $2"="$3; }' $containerfile
+)
+
+# Output commands to ensure environment variables defined in /etc/profile.local
+while IFS= read -r line
+do
+	setvarline="export $line"
+	echo ensure_line_in_file \"$setvarline\" /etc/profile.local >> $LOCAL_MODS
+done <<< "$ENVS"
+
+echo ensure_line_in_file \"export BROWSER=/mnt/c/Windows/explorer.exe\" /etc/profile.local >> $LOCAL_MODS
+
+# Give password-less sudo. This is only acceptable as it is a private
+# development environment not exposed to the outside world.
+# Do NOT do this on your host machine or otherwise.
+printf "\n%s\n" '# Set sudo to not require a password.' >> $LOCAL_MODS
+printf "%s\n" 'echo "%wheel ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers' >> $LOCAL_MODS
+
+chmod +x $LOCAL_MODS
+
+
+# =====================================================================================
+# Create script to create user when running in WSL.
+# =====================================================================================
+cat > $LOCAL_INIT <<'EOF'
+#!/bin/sh
+
+# Create user account.
+read -p "Enter username: " user
+useradd \
+	--create-home \
+	--groups wheel,docker \
+	--shell /bin/zsh \
+	$user
+
+# Make user default.
+echo [user] >> /etc/wsl.conf
+echo default=$user >> /etc/wsl.conf
+
+# Enable services.
+systemctl enable docker
+
+# Upgrade OS.
+printf "\n\nUpgrading OS..."
+zypper dist-upgrade
+
+EOF
+
+chmod +x $LOCAL_INIT
+
+
+# =====================================================================================
+# Create container and export to tar file.
+# =====================================================================================
+container=$(podman run -i --detach --entrypoint=sh $image)
+# echo $container
+podman cp $LOCAL_MODS $container:$CONTAINER_MODS
+podman cp $LOCAL_INIT $container:$CONTAINER_INIT
+# read -p "Continue?"
+echo "Running setup inside container: ${container:0:8} ($image)"
+podman exec $container sh $CONTAINER_MODS
+output="$(echo "${image##*/}" | tr ':.' '-_').tar"
+echo "Exporting container to $output"
+podman export $container > $output
+echo "Stopping container: ${container:0:8}"
+podman stop $container > /dev/null
+echo "Removing container: ${container:0:8}"
+podman rm $container > /dev/null
+
+
+# =====================================================================================
+# Clean up and exit.
+# =====================================================================================
+rm $LOCAL_MODS
+rm $LOCAL_INIT
+echo Done

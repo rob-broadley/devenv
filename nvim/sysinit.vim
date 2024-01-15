@@ -1,71 +1,4 @@
-" Get XDG_CONFIG_HOME or set to default if it doesn't exist
-let xdg_config_home = fnamemodify(
-	\ exists("$XDG_CONFIG_HOME") ? $XDG_CONFIG_HOME : '~/.config',
-	\ ':p'
-\)
-
-" Disable ALE language server features
-let g:ale_disable_lsp = 1
-
-" Set up dein (plugins)
-let dein_dir = fnamemodify(xdg_config_home.'nvim/dein', ':p')
-"dein Scripts-----------------------------
-if &compatible
-	set nocompatible							 " Be iMproved
-endif
-
-" Required:
-let &runtimepath.=','.escape(dein_dir.'repos/github.com/Shougo/dein.vim', '\,')
-
-" Required:
-if dein#load_state(dein_dir)
-	call dein#begin(dein_dir)
-
-	" Let dein manage dein
-	" Required:
-	call dein#add(dein_dir . 'repos/github.com/Shougo/dein.vim')
-
-	" Visual
-	call dein#add('navarasu/onedark.nvim')
-	call dein#add('nvim-lualine/lualine.nvim')
-	call dein#add('nvim-treesitter/nvim-treesitter', {'hook_post_update': 'TSUpdate'})
-	call dein#add('sheerun/vim-polyglot')
-	" Editor Config
-	call dein#add('editorconfig/editorconfig-vim')
-	" Linting and completion and auto-format
-	call dein#add('w0rp/ale')
-	call dein#add('neoclide/coc.nvim', {'merged': 0, 'rev': 'release'})
-	" VCS
-	call dein#add('lewis6991/gitsigns.nvim')
-	call dein#add('tpope/vim-fugitive')
-	" Commenting
-	call dein#add('tpope/vim-commentary')
-	" For Python
-	call dein#add('wookayin/semshi')
-	" For Pandoc / Markdown
-	call dein#add('vim-pandoc/vim-pandoc')
-	call dein#add('vim-pandoc/vim-pandoc-syntax')
-	" For keybinding help.
-	call dein#add('folke/which-key.nvim')
-
-	" Required:
-	call dein#end()
-	call dein#save_state()
-endif
-
-" Required:
-filetype plugin indent on
-syntax enable
-
-" Install missing plugins on startup.
-"if dein#check_install()
-"  call dein#install()
-"endif
-
-"End dein Scripts-------------------------
-
-
-" Basic Config
+" Basic Config.
 set guioptions=M
 set mouse=a
 set number
@@ -82,16 +15,68 @@ set spell spelllang=en_gb
 set splitright
 set splitbelow
 
-" Leave inset mode when focus lost
+" Leave inset mode when focus lost.
 autocmd FocusLost,TabLeave * stopinsert
 
-" Light the Scroll Lock LED when in insert mode
+" Light the Scroll Lock LED when in insert mode.
 augroup ScrollLockLED
 	autocmd!
 	autocmd InsertEnter * :silent !xset  led named 'Scroll Lock'
 	autocmd InsertLeave * :silent !xset -led named 'Scroll Lock'
 	autocmd VimLeave		* :silent !xset -led named 'Scroll Lock'
 augroup END
+
+
+" End configuration here if running as root (uid 0).
+if expand('$UID') == 0
+  :finish
+endif
+
+
+lua <<EOF
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system({
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable", -- latest stable release
+    lazypath,
+  })
+end
+vim.opt.rtp:prepend(lazypath)
+
+require("lazy").setup({
+	-- Visual.
+	"navarasu/onedark.nvim",
+	"nvim-lualine/lualine.nvim",
+	{"nvim-treesitter/nvim-treesitter", build = ":TSUpdate"},
+	"sheerun/vim-polyglot",
+	-- Editor Config.
+	"editorconfig/editorconfig-vim",
+	-- Linting and completion and auto-format.
+	"dense-analysis/ale",
+	{"neoclide/coc.nvim", branch = "release"},
+	-- VCS.
+	"lewis6991/gitsigns.nvim",
+	"tpope/vim-fugitive",
+	-- Commenting.
+	"tpope/vim-commentary",
+	-- For Python.
+	{"wookayin/semshi", build = ":UpdateRemotePlugins"},
+	-- For Pandoc / Markdown.
+	"vim-pandoc/vim-pandoc",
+	"vim-pandoc/vim-pandoc-syntax",
+	-- For keybinding help.
+	"folke/which-key.nvim",
+	-- coc extensions.
+	{"fannheyward/coc-pyright", build = "npm ci"},
+	-- {"neoclide/coc-json", build = "npm ci"},
+})
+
+EOF
+" End of lua block.
 
 
 " Completion
@@ -108,17 +93,29 @@ vnoremap <C-_> :Commentary<cr>
 nnoremap <C-_> :Commentary<cr>
 
 
-" Linting, completion and auto-format
+" Linting, completion and auto-format.
 let g:ale_linters = {'python': []}  " Disable python linters (using coc-pyright instead)
 let g:ale_fixers = {
-	\	'*': ['remove_trailing_lines', 'trim_whitespace'],
-	\ 'python': ['black', 'isort'],
+	\ '*': ['remove_trailing_lines', 'trim_whitespace'],
+	\ 'python': ['black', 'ruff'],
 \}
+" Set ruff to only fix import sorting not other auto-fixes
+" (note ruff_format not enabled).
+augroup PythonRuffFixer
+  autocmd!
+  autocmd User ALEFixPre  let b:ale_python_ruff_options = '--select=I'
+  autocmd User ALEFixPost let b:ale_python_ruff_options = ''
+augroup END
+" Set when to lint.
 let g:ale_lint_on_insert_leave = 1
 let g:ale_lint_on_text_changed = 0
 let g:ale_completion_enabled = 1
+" Disable ALE language server features.
+let g:ale_disable_lsp = 1
+" Set up completion menu.
 set completeopt=menu,menuone,preview,noselect,noinsert
-" Functions
+
+" Functions.
 function! s:show_documentation()
   if (index(['vim','help'], &filetype) >= 0)
     execute 'h '.expand('<cword>')
@@ -128,6 +125,7 @@ function! s:show_documentation()
     execute '!' . &keywordprg . ' ' . expand('<cword>')
   endif
 endfunction
+
 " Key bindings.
 " Show code action menu.
 nmap <silent> ca <Plug>(coc-codeaction-line)
@@ -146,7 +144,7 @@ nmap <Leader>f <Plug>(ale_fix)
 nnoremap <silent> K :call <SID>show_documentation()<CR>
 
 
-" Python Setup
+" Python Setup.
 let g:python_highlight_all = 1
 
 

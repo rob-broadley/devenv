@@ -1,0 +1,141 @@
+#!/bin/sh
+
+name="devenv"
+version=2.0.0
+
+# Print usage to stdout.
+# Arguments:
+#   None
+# Outputs:
+#   print usage with examples.
+show_help() {
+	cat << EOF
+${name} version: ${version}
+
+Usage:
+
+	build [Options] [Stages]
+
+	build
+	build image
+	build container
+	build --dryrun image container
+	build --version
+	build --help
+
+Stages:
+
+	image:          build container image
+	container:      create and initialise container
+	enter:          enter the container
+	wsl:            build a WSL image
+
+Options:
+
+	--dry-run/-d:   only print the command generated
+	--version/-V:   show ${name} version
+	--help/-h:      show this message
+EOF
+}
+
+# Defaults
+if [ $# -eq 0 ]; then
+	image=1
+	container=1
+else
+	image=0
+	container=0
+fi
+enter=0
+wsl=0
+dryrun=0
+
+# Parse arguments
+while :; do
+	case $1 in
+		image)
+			image=1
+			shift
+			;;
+		container)
+			container=1
+			shift
+			;;
+		enter)
+			enter=1
+			shift
+			;;
+		wsl)
+			wsl=1
+			shift
+			;;
+		-d | --dryrun)
+			dryrun=1
+			shift
+			;;
+		-V | --version)
+			printf "${name}: %s\n" "${version}"
+			exit 0
+			;;
+		-h | --help)
+			show_help
+			exit 0
+			;;
+		--) # End of all options.
+			shift
+			break
+			;;
+		-*) # Invalid options.
+			printf >&2 "ERROR: Invalid flag '%s'\n\n" "$1"
+			show_help
+			exit 1
+			;;
+		*)  # Invalid subcommand.
+			if [ -n "$1" ]; then
+				printf >&2 "ERROR: Invalid subcommand '%s'\n\n" "$1"
+				show_help
+				exit 1
+			else
+				break
+			fi
+			;;
+	esac
+done
+
+declare -a cmd
+
+if [ "${image}" -ne 0 ]; then
+	args=(
+		--pull=newer
+		--label devenv.version=${version}
+		--tag ${name}:latest
+		--tag ${name}:${version}
+		# Set context as directory containing this script.
+		"$(dirname "$0")"
+	)
+	cmd+=("podman build $(printf "%s " "${args[@]}")")
+fi
+
+if [ "${container}" -ne 0 ]; then
+	cmd+=("SHELL=/bin/zsh distrobox assemble create --replace --file distrobox.ini")
+	cmd+=("distrobox enter --no-tty ${name} -- init_container.sh --")
+fi
+
+if [ "${enter}" -ne 0 ]; then
+	cmd+=("distrobox enter ${name}")
+fi
+
+if [ "${wsl}" -ne 0 ]; then
+	cmd+=("./build-wsl $name")
+fi
+
+# Join elements of array (commands) with "  && " before command and newline after.
+finalcmd=$(printf "  && %s\n" "${cmd[@]}")
+# Strip "  && " from beginning of string.
+finalcmd=${finalcmd:5}
+
+if [ "${dryrun}" -eq 0 ]; then
+	eval $finalcmd
+else
+	printf >&2 "$finalcmd\n"
+fi
