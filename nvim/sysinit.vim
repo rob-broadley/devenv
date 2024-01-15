@@ -34,6 +34,11 @@ endif
 
 
 lua <<EOF
+-- Set location of system Python.
+-- Otherwise pynvim needs to be installed in every venv.
+vim.g.python_host_prog = "/usr/bin/python3"
+vim.g.python3_host_prog = "/usr/bin/python3"
+
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system({
