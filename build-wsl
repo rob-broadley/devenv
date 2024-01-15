@@ -104,6 +104,9 @@ useradd \
 echo [user] >> /etc/wsl.conf
 echo default=$user >> /etc/wsl.conf
 
+# Enable services.
+systemctl enable docker
+
 # Upgrade OS.
 printf "\n\nUpgrading OS..."
 zypper dist-upgrade
