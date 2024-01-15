@@ -21,7 +21,7 @@ poppler-tools odt2txt
 # For ranger preview of media info
 mediainfo
 # For containers
-docker docker-compose docker-zsh-completion
+docker docker-buildx docker-compose docker-zsh-completion
 # Compliers
 gcc gcc-c++
 # For development
