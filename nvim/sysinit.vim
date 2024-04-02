@@ -27,8 +27,8 @@ augroup ScrollLockLED
 augroup END
 
 
-" End configuration here if running as root (uid 0).
-if expand('$UID') == 0
+" End configuration here if running as privileged / system user.
+if expand('$EUID') < 1000
   :finish
 endif
 

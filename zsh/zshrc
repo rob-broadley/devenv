@@ -1,4 +1,15 @@
 # **************************************************************************************
+# Return if running as a system user (i.e. skip the rest of the file).
+# This is done to prevent zsh plugins, themes, functions, etc. being run as a
+# system / privileged user.
+# **************************************************************************************
+if [ $EUID -lt 1000 ]  # Effective User ID less than 1000.
+then
+	return
+fi
+
+
+# **************************************************************************************
 # Set up paths
 # **************************************************************************************
 ZSH_DIR=${XDG_CONFIG_HOME:-$HOME/.config}/zsh
