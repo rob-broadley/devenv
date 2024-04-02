@@ -108,8 +108,14 @@ while :; do
 	esac
 done
 
-declare -a cmd
-
+# Run or print command, depending on state of $dryrun.
+# Globals:
+#		dryrun
+# Arguments:
+#   Command to run.
+#   Arguments for command to run.
+# Outputs:
+#   If dryrun set print command which would be run.
 run() {
 	if [ "${dryrun}" -ne 0 ]; then
 		echo "$*"
@@ -119,8 +125,20 @@ run() {
 	fi
 }
 
+# Write text to file or display text which would be written,
+# depending on state of $dryrun.
+# Overwrites the file, rather than appending.
+# Globals:
+#		dryrun
+# Arguments:
+#   File to write to, a path.
+#   Lines to write to the file, an array.
+# Outputs:
+#   If dryrun set print file path and content which would be written.
 write_to_file() {
 	if [ "${dryrun}" -ne 0 ]; then
+		# Insert line breaks between lines (items in array) and then add fence around
+		# content to be written. Then output that after declaring where it will be written.
 		echo "Write the following to $1:$(printf '\n```\n%s\n```\n' "$(printf '%s\n' "${@:2}")")"
 		echo  # Add blank line before next output.
 	else

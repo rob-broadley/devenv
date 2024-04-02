@@ -117,7 +117,6 @@ container=$(podman run -i --detach --entrypoint=sh $image)
 # echo $container
 podman cp $LOCAL_MODS $container:$CONTAINER_MODS
 podman cp $LOCAL_INIT $container:$CONTAINER_INIT
-# read -p "Continue?"
 echo "Running setup inside container: ${container:0:8} ($image)"
 podman exec $container sh $CONTAINER_MODS
 output="$(echo "${image##*/}" | tr ':.' '-_').tar"
