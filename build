@@ -29,6 +29,7 @@ Stages:
 	container:      create and initialise container
 	enter:          enter the container
 	wsl:            build a WSL image
+	bin:            add script which enters devenv to user's bin directory
 
 Options:
 
@@ -39,7 +40,7 @@ EOF
 }
 
 # Defaults
-if [ $# -eq 0 ]; then
+if [ $# -eq 0 ] || [ "$*" == "--dryrun" ] || [ "$*" == "-d" ]; then
 	image=1
 	container=1
 else
@@ -48,6 +49,7 @@ else
 fi
 enter=0
 wsl=0
+bin=0
 dryrun=0
 
 # Parse arguments
@@ -67,6 +69,10 @@ while :; do
 			;;
 		wsl)
 			wsl=1
+			shift
+			;;
+		bin)
+			bin=1
 			shift
 			;;
 		-d | --dryrun)
@@ -104,6 +110,24 @@ done
 
 declare -a cmd
 
+run() {
+	if [ "${dryrun}" -ne 0 ]; then
+		echo "$*"
+		echo  # Add blank line before next output.
+	else
+		eval "$@"
+	fi
+}
+
+write_to_file() {
+	if [ "${dryrun}" -ne 0 ]; then
+		echo "Write the following to $1:$(printf '\n```\n%s\n```\n' "$(printf '%s\n' "${@:2}")")"
+		echo  # Add blank line before next output.
+	else
+		printf '%s\n' "${@:2}" > $1
+	fi
+}
+
 if [ "${image}" -ne 0 ]; then
 	args=(
 		--pull=newer
@@ -113,29 +137,25 @@ if [ "${image}" -ne 0 ]; then
 		# Set context as directory containing this script.
 		"$(dirname "$0")"
 	)
-	cmd+=("podman build $(printf "%s " "${args[@]}")")
+	run podman build $(printf "%s " "${args[@]}")
 fi
 
 if [ "${container}" -ne 0 ]; then
-	cmd+=("SHELL=/bin/zsh distrobox assemble create --replace --file distrobox.ini")
-	cmd+=("distrobox enter --no-tty ${name} -- init_container.sh --")
+	run SHELL=/bin/zsh distrobox assemble create --replace --file distrobox.ini
+	run distrobox enter --no-tty $name -- init_container.sh --
 fi
 
 if [ "${enter}" -ne 0 ]; then
-	cmd+=("distrobox enter ${name}")
+	run distrobox enter $name
 fi
 
 if [ "${wsl}" -ne 0 ]; then
-	cmd+=("./build-wsl $name")
+	run ./build-wsl $name
 fi
 
-# Join elements of array (commands) with "  && " before command and newline after.
-finalcmd=$(printf "  && %s\n" "${cmd[@]}")
-# Strip "  && " from beginning of string.
-finalcmd=${finalcmd:5}
-
-if [ "${dryrun}" -eq 0 ]; then
-	eval $finalcmd
-else
-	printf >&2 "$finalcmd\n"
+if [ "${bin}" -ne 0 ]; then
+	excfile="${HOME}/.local/bin/${name}"
+	content=('#!/bin/sh' '' "distrobox enter ${name}")
+	write_to_file $excfile "${content[@]}"
+	run chmod +x $excfile
 fi
