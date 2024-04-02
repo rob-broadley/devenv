@@ -98,7 +98,7 @@ The setup is designed for the following terminal colors:
 | background-color    |   #282C34 |
 | foreground-color    |   #ABB2BF |
 | black               |   #1F2229 |
-| red           	    |   #E06C75 |
+| red                 |   #E06C75 |
 | green               |   #98C379 |
 | yellow              |   #D19a66 |
 | blue                |   #61AFEF |
