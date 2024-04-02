@@ -33,7 +33,7 @@ Stages:
 
 Options:
 
-	--dry-run/-d:   only print the command generated
+	--dryrun/-d:    only print the command generated
 	--version/-V:   show ${name} version
 	--help/-h:      show this message
 EOF
