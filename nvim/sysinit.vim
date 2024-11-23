@@ -1,39 +1,26 @@
-" Basic Config.
-set guioptions=M
-set mouse=a
-set number
-set breakindent
-set showbreak=->
-set expandtab
-" Toggle paste mode.
-set pastetoggle=<Leader>p
-" Use tabs for make files
-autocmd FileType make setlocal noexpandtab
-" Spelling
-set spell spelllang=en_gb
-" Split directions
-set splitright
-set splitbelow
-
-" Leave inset mode when focus lost.
-autocmd FocusLost,TabLeave * stopinsert
-
-" Light the Scroll Lock LED when in insert mode.
-augroup ScrollLockLED
-	autocmd!
-	autocmd InsertEnter * :silent !xset  led named 'Scroll Lock'
-	autocmd InsertLeave * :silent !xset -led named 'Scroll Lock'
-	autocmd VimLeave		* :silent !xset -led named 'Scroll Lock'
-augroup END
-
-
-" End configuration here if running as privileged / system user.
-if expand('$EUID') < 1000
-  :finish
-endif
-
-
 lua <<EOF
+-- Basic Config
+vim.opt.mouse = "a"
+vim.opt.number = true
+vim.opt.breakindent = true
+vim.opt.showbreak = "->"
+vim.opt.expandtab = true
+vim.opt.spell = true
+vim.opt.spelllang = "en_gb"
+vim.opt.splitright = true
+vim.opt.splitbelow = true
+
+-- Leave insert mode when focus lost.
+vim.api.nvim_create_autocmd(
+	{"FocusLost", "TabLeave"},
+	{command = "stopinsert"}
+)
+
+-- End configuration here if running as privileged / system user.
+if tonumber(vim.fn.expand("$EUID")) < 1000 then
+	return
+end
+
 -- Set location of system Python.
 -- Otherwise pynvim needs to be installed in every venv.
 vim.g.python_host_prog = "/usr/bin/python3"
@@ -80,80 +67,86 @@ require("lazy").setup({
 	-- {"neoclide/coc-json", build = "npm ci"},
 })
 
-EOF
-" End of lua block.
+-- Completion
+-- Autocomplete with dictionary words when spell check is on.
+vim.opt.complete:append("kspell")
+-- Map Ctrl+s to word suggestions.
+vim.keymap.set("i", "<C-s>", "<C-x><C-k>", {noremap = true, silent = true})
+-- Map enter to except suggestion.
+vim.keymap.set(
+	"i",
+	"<cr>",
+	[[coc#pum#visible() ? coc#_select_confirm() : "\<CR>"]],
+	{expr = true, noremap = true}
+)
 
+-- Commenting
+-- Make Ctrl+/ comment line or selection.
+vim.keymap.set("v", "<C-_>", ":Commentary<cr>", {noremap = true})
+vim.keymap.set("n", "<C-_>", ":Commentary<cr>", {noremap = true})
 
-" Completion
-" Autocomplete with dictionary words when spell check is on.
-set complete+=kspell
-" Map Ctrl+s to word suggestions.
-inoremap <silent> <C-s> <C-x><C-k>
-" Map enter to except suggestion.
-inoremap <expr> <cr> coc#pum#visible() ? coc#_select_confirm() : "\<CR>"
+-- Linting, completion and auto-format.
+-- Disable python linters (using coc-pyright instead).
+vim.g.ale_linters = {python = {}}
+-- Set fixers.
+vim.g.ale_fixers = {
+	['*'] = {'remove_trailing_lines', 'trim_whitespace'},
+	python = {'black', 'ruff'}
+}
+-- Set ruff to only fix import sorting not other auto-fixes
+-- (note ruff_format not enabled).
+--local python_ruff_fixer = vim.api.nvim_create_augroup("PythonRuffFixer", { clear = true })
+vim.api.nvim_create_autocmd(
+	{"User"},
+	{
+    pattern = "ALEFixPre",
+    group = python_ruff_fixer,
+    callback = function() vim.g.ale_python_ruff_options = '--select=I' end,
+	}
+)
+vim.api.nvim_create_autocmd(
+	{"User"},
+	{
+    pattern = "ALEFixPost",
+    group = python_ruff_fixer,
+    callback = function() vim.g.ale_python_ruff_options = '' end ,
+	}
+)
+-- Set when to lint.
+vim.g.ale_lint_on_insert_leave = 1
+vim.g.ale_lint_on_text_changed = 0
+vim.g.ale_completion_enabled = 1
+-- Disable ALE language server features.
+vim.g.ale_disable_lsp = 1
+-- Set up completion menu.
+vim.opt.completeopt = {"menu", "menuone", "preview", "noselect", "noinsert"}
+-- Use K to show documentation in preview window.
+function _G.show_docs()
+    local cw = vim.fn.expand('<cword>')
+    if vim.fn.index({'vim', 'help'}, vim.bo.filetype) >= 0 then
+        vim.api.nvim_command('h ' .. cw)
+    elseif vim.api.nvim_eval('coc#rpc#ready()') then
+        vim.fn.CocActionAsync('doHover')
+    else
+        vim.api.nvim_command('!' .. vim.o.keywordprg .. ' ' .. cw)
+    end
+end
+vim.keymap.set("n", "K", '<CMD>lua _G.show_docs()<CR>', {silent = true})
+-- Show code action menu.
+vim.keymap.set("n", "ca", "<Plug>(coc-codeaction-line)", {silent = true})
+-- Go to definition and references.
+vim.keymap.set("n", "gd", "<Plug>(coc-definition)", {silent = true})
+vim.keymap.set("n", "gr", "<Plug>(coc-references)", {silent = true})
+-- Go to issues.
+vim.keymap.set("n", "]l", "<Plug>(coc-diagnostic-next)", {silent = true})
+vim.keymap.set("n", "[l", "<Plug>(coc-diagnostic-prev)", {silent = true})
+-- Rename with F2.
+vim.keymap.set("n", "<F2>", "<Plug>(coc-rename)")
+-- Auto-format with leader f.
+vim.keymap.set("n", "<Leader>f", "<Plug>(ale_fix)")
 
-
-" Commenting (Make Ctrl+/ comment line or selection)
-vnoremap <C-_> :Commentary<cr>
-nnoremap <C-_> :Commentary<cr>
-
-
-" Linting, completion and auto-format.
-let g:ale_linters = {'python': []}  " Disable python linters (using coc-pyright instead)
-let g:ale_fixers = {
-	\ '*': ['remove_trailing_lines', 'trim_whitespace'],
-	\ 'python': ['black', 'ruff'],
-\}
-" Set ruff to only fix import sorting not other auto-fixes
-" (note ruff_format not enabled).
-augroup PythonRuffFixer
-  autocmd!
-  autocmd User ALEFixPre  let b:ale_python_ruff_options = '--select=I'
-  autocmd User ALEFixPost let b:ale_python_ruff_options = ''
-augroup END
-" Set when to lint.
-let g:ale_lint_on_insert_leave = 1
-let g:ale_lint_on_text_changed = 0
-let g:ale_completion_enabled = 1
-" Disable ALE language server features.
-let g:ale_disable_lsp = 1
-" Set up completion menu.
-set completeopt=menu,menuone,preview,noselect,noinsert
-
-" Functions.
-function! s:show_documentation()
-  if (index(['vim','help'], &filetype) >= 0)
-    execute 'h '.expand('<cword>')
-  elseif (coc#rpc#ready())
-    call CocActionAsync('doHover')
-  else
-    execute '!' . &keywordprg . ' ' . expand('<cword>')
-  endif
-endfunction
-
-" Key bindings.
-" Show code action menu.
-nmap <silent> ca <Plug>(coc-codeaction-line)
-" Go to definition and references.
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gr <Plug>(coc-references)
-" Go to issues.
-nmap <silent> ]l <Plug>(coc-diagnostic-next)
-nmap <silent> [l <Plug>(coc-diagnostic-prev)
-
-" Rename with F2.
-nmap <F2> <Plug>(coc-rename)
-" Auto-format with leader f.
-nmap <Leader>f <Plug>(ale_fix)
-" Use K to show documentation in preview window.
-nnoremap <silent> K :call <SID>show_documentation()<CR>
-
-
-" Python Setup.
-let g:python_highlight_all = 1
-
-
-lua <<EOF
+-- Python Setup.
+vim.g.python_highlight_all = 1
 
 -- If running headless, skip setup.
 if next(vim.api.nvim_list_uis()) == nil then
