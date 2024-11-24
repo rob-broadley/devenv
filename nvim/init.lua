@@ -186,8 +186,8 @@ require('lualine').setup {
 				fmt = function(str)
 					-- Remove branch prefix (any letters up to and including 1st '/').
 					str = str:gsub('^%a+%/', '')
-					-- Limit branch to 10 chars, unless diff mode, then 30.
-          local max = 10
+					-- Limit branch to 20 chars, unless diff mode, then 30.
+					local max = 20
 					if vim.api.nvim_win_get_option(0, 'diff') then
 						max = 30
           end
