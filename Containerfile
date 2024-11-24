@@ -52,7 +52,7 @@ COPY zsh/zshrc /etc/zsh.zshrc.local
 
 # Set up neovim
 COPY nvim/sysinit.vim /etc/xdg/nvim/sysinit.vim
-copy nvim/init.lua /etc/xdg/nvim/lua/init.lua
+COPY nvim/lua /etc/xdg/nvim/lua/
 COPY nvim/coc-settings.json /etc/skel/.config/nvim/coc-settings.json
 
 # vim: set ft=dockerfile:

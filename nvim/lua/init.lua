@@ -25,6 +25,7 @@ end
 vim.g.python_host_prog = "/usr/bin/python3"
 vim.g.python3_host_prog = "/usr/bin/python3"
 
+-- Set up plugin manager.
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system({
@@ -37,38 +38,8 @@ if not vim.loop.fs_stat(lazypath) then
   })
 end
 vim.opt.rtp:prepend(lazypath)
-
-require("lazy").setup({
-	-- Visual.
-	"navarasu/onedark.nvim",
-	"nvim-lualine/lualine.nvim",
-	{"nvim-treesitter/nvim-treesitter", build = ":TSUpdate"},
-	"sheerun/vim-polyglot",
-	-- Editor Config.
-	"editorconfig/editorconfig-vim",
-	-- Linting and completion and auto-format.
-	"dense-analysis/ale",
-	{"neoclide/coc.nvim", branch = "release"},
-	-- VCS.
-	"lewis6991/gitsigns.nvim",
-	"tpope/vim-fugitive",
-	-- Commenting.
-	"tpope/vim-commentary",
-	-- For Python.
-	{"wookayin/semshi", build = ":UpdateRemotePlugins"},
-	-- For Pandoc / Markdown.
-	"vim-pandoc/vim-pandoc",
-	"vim-pandoc/vim-pandoc-syntax",
-	-- For keybinding help.
-	{
-		"folke/which-key.nvim",
-		event = "VeryLazy",
-		opts = {},
-	},
-	-- coc extensions.
-	{"fannheyward/coc-pyright", build = "npm ci"},
-	-- {"neoclide/coc-json", build = "npm ci"},
-})
+-- Load / Configure plugins.
+require("lazy").setup("plugins")
 
 -- Completion
 -- Autocomplete with dictionary words when spell check is on.
@@ -150,68 +121,3 @@ vim.keymap.set("n", "<Leader>f", "<Plug>(ale_fix)")
 
 -- Python Setup.
 vim.g.python_highlight_all = 1
-
--- If running headless, skip setup.
-if next(vim.api.nvim_list_uis()) == nil then
-	return
-end
-
--- Theme.
-require('onedark').setup {
-	style = 'warmer',
-	transparent = true,
-	code_style = {
-		comments = 'none',
-	},
-	highlights = {
-		DiffAdd = {bg = '#273327'},
-		DiffChange = {bg = '#262733'},
-		DiffDelete = {bg = '#332727'},
-		DiffText = {bg = '#3a3b4c'},
-		SpellBad = {fg = '$red'},
-		TODO = {fg = '$orange', fmt = 'bold'},
-	},
-}
-require('onedark').load()
-
--- Status Line.
-require('lualine').setup {
-	options = {
-		theme = 'onedark',
-	},
-	sections = {
-		lualine_b = {
-			{
-				'branch',
-				fmt = function(str)
-					-- Remove branch prefix (any letters up to and including 1st '/').
-					str = str:gsub('^%a+%/', '')
-					-- Limit branch to 20 chars, unless diff mode, then 30.
-					local max = 20
-					if vim.api.nvim_win_get_option(0, 'diff') then
-						max = 30
-					end
-					return str:sub(0, max)
-				end
-			},
-			'diff',
-			'diagnostics',
-		},
-	},
-}
-
--- Improved syntax highlighting.
-require('nvim-treesitter.configs').setup {
-	ensure_installed = {
-		"lua", "vim", "vimdoc", "markdown", "markdown_inline", "python",
-	},
-	highlight = {
-		enable = true,
-	},
-	indent = {
-		enable = true,
-	},
-}
-
--- Git decorations.
-require('gitsigns').setup {}
