@@ -202,6 +202,9 @@ require('lualine').setup {
 
 -- Improved syntax highlighting.
 require('nvim-treesitter.configs').setup {
+	ensure_installed = {
+		"lua", "vim", "vimdoc", "markdown", "markdown_inline", "python",
+	},
 	highlight = {
 		enable = true,
 	},
