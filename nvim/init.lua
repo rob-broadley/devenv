@@ -60,7 +60,11 @@ require("lazy").setup({
 	"vim-pandoc/vim-pandoc",
 	"vim-pandoc/vim-pandoc-syntax",
 	-- For keybinding help.
-	"folke/which-key.nvim",
+	{
+		"folke/which-key.nvim",
+		event = "VeryLazy",
+		opts = {},
+	},
 	-- coc extensions.
 	{"fannheyward/coc-pyright", build = "npm ci"},
 	-- {"neoclide/coc-json", build = "npm ci"},
@@ -208,7 +212,3 @@ require('nvim-treesitter.configs').setup {
 
 -- Git decorations.
 require('gitsigns').setup {}
-
--- Keybinding help.
-local wk = require('which-key')
-wk.register(mappings, opts)
