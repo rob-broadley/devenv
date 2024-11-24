@@ -102,17 +102,17 @@ local python_ruff_fixer = vim.api.nvim_create_augroup("PythonRuffFixer", {clear 
 vim.api.nvim_create_autocmd(
 	{"User"},
 	{
-    pattern = "ALEFixPre",
-    group = python_ruff_fixer,
-    callback = function() vim.g.ale_python_ruff_options = '--select=I' end,
+		pattern = "ALEFixPre",
+		group = python_ruff_fixer,
+		callback = function() vim.g.ale_python_ruff_options = '--select=I' end,
 	}
 )
 vim.api.nvim_create_autocmd(
 	{"User"},
 	{
-    pattern = "ALEFixPost",
-    group = python_ruff_fixer,
-    callback = function() vim.g.ale_python_ruff_options = '' end ,
+		pattern = "ALEFixPost",
+		group = python_ruff_fixer,
+		callback = function() vim.g.ale_python_ruff_options = '' end ,
 	}
 )
 -- Set when to lint.
@@ -190,12 +190,12 @@ require('lualine').setup {
 					local max = 20
 					if vim.api.nvim_win_get_option(0, 'diff') then
 						max = 30
-          end
-          return str:sub(0, max)
+					end
+					return str:sub(0, max)
 				end
 			},
-      'diff',
-      'diagnostics',
+			'diff',
+			'diagnostics',
 		},
 	},
 }
@@ -208,7 +208,7 @@ require('nvim-treesitter.configs').setup {
 	highlight = {
 		enable = true,
 	},
-  indent = {
+	indent = {
 		enable = true,
 	},
 }
