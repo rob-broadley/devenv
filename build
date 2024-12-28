@@ -25,6 +25,7 @@ Usage:
 
 Stages:
 
+	pull:           pull the base image
 	image:          build container image
 	container:      create and initialise container
 	enter:          enter the container
@@ -41,9 +42,11 @@ EOF
 
 # Defaults
 if [ $# -eq 0 ] || [ "$*" == "--dryrun" ] || [ "$*" == "-d" ]; then
+	pull=1
 	image=1
 	container=1
 else
+	pull=0
 	image=0
 	container=0
 fi
@@ -55,6 +58,10 @@ dryrun=0
 # Parse arguments
 while :; do
 	case $1 in
+		pull)
+			pull=1
+			shift
+			;;
 		image)
 			image=1
 			shift
@@ -146,9 +153,15 @@ write_to_file() {
 	fi
 }
 
+if [ "${pull}" -ne 0 ]; then
+	images_to_pull=$(grep FROM Containerfile | sed 's/FROM //g' | sed 's/ as .*$//g')
+	for image_to_pull in $images_to_pull; do
+		run podman pull $image_to_pull
+	done
+fi
+
 if [ "${image}" -ne 0 ]; then
 	args=(
-		--pull=newer
 		--label devenv.version=${version}
 		--tag ${name}:latest
 		--tag ${name}:${version}
