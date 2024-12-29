@@ -1,9 +1,14 @@
 {
 	"profiles": [
 		{
-			"antialiasingMode": "aliased",
-			"fontWeight": "bold",
-			"colorScheme": "One Dark (devenv)"
+			"startingDirectory": "~",
+			"antialiasingMode": "cleartype",
+			"font": {
+				"size": 10,
+				"weight": "normal"
+			},
+			"colorScheme": "One Dark (devenv)",
+			"suppressApplicationTitle": true,
 		}
 	],
 	"schemes": [
@@ -14,7 +19,7 @@
 			"selectionBackground": "#5C6370",
 
 			"background" : "#1E2127",
-			"foreground" : "#5C6370",
+			"foreground" : "#878E9D",
 
 			"black": "#0C0C0C",
 			"red": "#E06C75",

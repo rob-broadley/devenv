@@ -110,6 +110,7 @@ podman exec $container sh -c "$CONTAINER_MODS; rm $CONTAINER_MODS"
 podman cp $LOCAL_INIT $container:$CONTAINER_INIT
 podman cp $LOCAL_DIST_CONF $container:$CONTAINER_DIST_CONF
 podman cp $LOCAL_TERMINAL_PROFILE $container:$CONTAINER_TERMINAL_PROFILE
+podman cp $LOCAL_ICON $container:$CONTAINER_ICON
 
 output="$(echo "${image##*/}" | tr ':.' '-_').wsl"
 echo "Exporting container '${container:0:8}' to $output"

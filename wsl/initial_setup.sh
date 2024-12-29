@@ -20,6 +20,9 @@ else
 fi
 
 # Enable services.
+echo 'Enabling System Services:'
+echo  # Line break.
+echo 'Docker'
 systemctl enable docker
 
 # Upgrade OS.
