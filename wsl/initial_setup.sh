@@ -20,6 +20,7 @@ else
 fi
 
 # Enable services.
+echo  # Line break.
 echo 'Enabling System Services:'
 echo  # Line break.
 echo 'Docker'
