@@ -1,14 +1,14 @@
 {
 	"profiles": [
 		{
-			"startingDirectory": "~",
 			"antialiasingMode": "cleartype",
+			"colorScheme": "One Dark (devenv)",
 			"font": {
 				"size": 10,
 				"weight": "normal"
 			},
-			"colorScheme": "One Dark (devenv)",
-			"suppressApplicationTitle": true,
+			"startingDirectory": "~",
+			"suppressApplicationTitle": true
 		}
 	],
 	"schemes": [
