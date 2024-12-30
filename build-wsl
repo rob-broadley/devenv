@@ -9,14 +9,17 @@ TMP_DIR="$WSL_DIR/tmp"
 mkdir -p $TMP_DIR
 CONTAINER_WSL_LIB="/usr/lib/wsl"
 
+# Script to modify image before distribution.
 MODS_TEMPLATE="$WSL_DIR/image_mod.sh"
 LOCAL_MODS="$TMP_DIR/image_mod.sh"
 CONTAINER_MODS="/tmp/setup.sh"
 
+# Script for initial setup by user once installed.
 INIT_TEMPLATE="$WSL_DIR/initial_setup.sh"
 LOCAL_INIT="$TMP_DIR/initial_setup.sh"
 CONTAINER_INIT="$CONTAINER_WSL_LIB/initial-setup.sh"
 
+# WSL distribution configuration and associated files.
 DIST_CONF_TEMPLATE="$WSL_DIR/wsl-distribution.conf"
 LOCAL_DIST_CONF="$TMP_DIR/wsl-distribution.conf"
 CONTAINER_DIST_CONF="/etc/wsl-distribution.conf"
@@ -27,9 +30,11 @@ CONTAINER_ICON="$CONTAINER_WSL_LIB/devenv.ico"
 LOCAL_TERMINAL_PROFILE="$WSL_DIR/terminal-profile.json"
 CONTAINER_TERMINAL_PROFILE="$CONTAINER_WSL_LIB/terminal-profile.json"
 
+# Fix for WSLg runtime files not available in XDG_RUNTIME_DIR.
 LOCAL_RUNTIME_DIR_OVERRIDE="$WSL_DIR/runtime-dir-override.conf"
 CONTAINER_RUNTIME_DIR_OVERRIDE="/etc/systemd/system/user-runtime-dir@.service.d/override.conf"
 
+# WSL specific configuration for neovim.
 LOCAL_WSL_NVIM="$WSL_DIR/nvim-wsl.lua"
 CONTAINER_WSL_NVIM="/etc/xdg/nvim/lua/wsl.lua"
 
