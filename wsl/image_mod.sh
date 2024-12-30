@@ -23,6 +23,9 @@ EOF
 # Devcontainer builds fail to pull images without this.
 zypper install --no-recommends --no-confirm password-store
 
+# Install container based development tools.
+zypper install --no-recommends --no-confirm distrobox podman
+
 # Give password-less sudo. This is only acceptable as it is a private
 # development environment not exposed to the outside world.
 # Do NOT do this on your host machine or otherwise.
