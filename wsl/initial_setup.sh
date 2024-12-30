@@ -19,6 +19,8 @@ fi
 echo  # Line break.
 echo 'Enabling System Services:'
 echo  # Line break.
+echo 'Shared Root'
+systemctl enable shared-root
 echo 'Docker'
 systemctl enable docker
 

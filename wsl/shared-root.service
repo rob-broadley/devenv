@@ -1,0 +1,12 @@
+[Unit]
+Description=Remount / as shared
+Requires=local-fs.target
+After=local-fs.target
+Before=podman.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/mount --make-rshared /
+
+[Install]
+WantedBy=default.target
