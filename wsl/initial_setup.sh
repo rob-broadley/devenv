@@ -22,13 +22,18 @@ echo  # Line break.
 echo 'Docker'
 systemctl enable docker
 
+echo  # Line break.
+echo 'Setting up Podman...'
+# Set up UIDs for rootless Podman.
+usermod --add-subuids 100000-165535 --add-subgids 100000-165535 $user
+
 # Upgrade OS.
 echo  # Line break.
 read -p 'Upgrade OS? [Y/n]: ' upgrade
 echo  # Line break.
 case $upgrade in
 	[Nn]*)
-		echo 'Skipping OS upgrade...'
+		echo 'Skipping OS upgrade.'
 		;;
 	*)
 		echo 'Upgrading OS...'
