@@ -27,8 +27,11 @@ CONTAINER_ICON="$CONTAINER_WSL_LIB/devenv.ico"
 LOCAL_TERMINAL_PROFILE="$WSL_DIR/terminal-profile.json"
 CONTAINER_TERMINAL_PROFILE="$CONTAINER_WSL_LIB/terminal-profile.json"
 
-LOCAL_RUNTIME_DIR_OVERRIDE="wsl/runtime-dir-override.conf"
+LOCAL_RUNTIME_DIR_OVERRIDE="$WSL_DIR/runtime-dir-override.conf"
 CONTAINER_RUNTIME_DIR_OVERRIDE="/etc/systemd/system/user-runtime-dir@.service.d/override.conf"
+
+LOCAL_WSL_NVIM="$WSL_DIR/nvim-wsl.lua"
+CONTAINER_WSL_NVIM="/etc/xdg/nvim/lua/wsl.lua"
 
 PROFILE_FILE="/etc/profile.local"
 
@@ -115,6 +118,7 @@ podman cp $LOCAL_DIST_CONF $container:$CONTAINER_DIST_CONF
 podman cp $LOCAL_TERMINAL_PROFILE $container:$CONTAINER_TERMINAL_PROFILE
 podman cp $LOCAL_ICON $container:$CONTAINER_ICON
 podman cp $LOCAL_RUNTIME_DIR_OVERRIDE $container:$CONTAINER_RUNTIME_DIR_OVERRIDE
+podman cp $LOCAL_WSL_NVIM $container:$CONTAINER_WSL_NVIM
 
 output="$(echo "${image##*/}" | tr ':.' '-_').wsl"
 echo "Exporting container '${container:0:8}' to $output"

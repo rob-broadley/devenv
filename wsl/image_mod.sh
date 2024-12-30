@@ -27,3 +27,6 @@ zypper install --no-recommends --no-confirm password-store
 # development environment not exposed to the outside world.
 # Do NOT do this on your host machine or otherwise.
 echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+# Make neovim load WSL specific config.
+ensure_line_in_file "lua require('wsl')" '/etc/xdg/nvim/sysinit.vim'

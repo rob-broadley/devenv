@@ -38,8 +38,17 @@ if not vim.loop.fs_stat(lazypath) then
   })
 end
 vim.opt.rtp:prepend(lazypath)
+local opts = {
+	performance = {
+		rtp = {
+			-- Do not reset the runtime path.
+			-- This is so other lua config files can be loaded after the plugins.
+			reset = false,
+		},
+	},
+}
 -- Load / Configure plugins.
-require("lazy").setup("plugins")
+require("lazy").setup("plugins", opts)
 
 -- Completion
 -- Autocomplete with dictionary words when spell check is on.
