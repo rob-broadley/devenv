@@ -66,6 +66,10 @@ echo >> $LOCAL_MODS  # Add blank line.
 echo "# Make sure WSL lib directory is created for files to be copied to." >> $LOCAL_MODS
 echo "mkdir -p $CONTAINER_WSL_LIB" >> $LOCAL_MODS
 
+echo >> $LOCAL_MODS  # Add blank line.
+echo "# Make sure systemd runtimedir override directory is created for files to be copied to." >> $LOCAL_MODS
+echo "mkdir -p $(dirname -- $CONTAINER_RUNTIME_DIR_OVERRIDE)" >> $LOCAL_MODS
+
 # Extract environment variables from Containerfile
 # Separate on lines beginning with ENV on white space but not if inside quotes.
 # Output string {2nd column}={3rd column} e.g. ENV EDITOR nvim > EDITOR=nvim
