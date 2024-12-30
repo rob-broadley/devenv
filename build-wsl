@@ -60,7 +60,9 @@ echo "Using image: $image"
 # =====================================================================================
 # Create pre-export setup script.
 # =====================================================================================
-cat $MODS_TEMPLATE > $LOCAL_MODS
+cat $MODS_TEMPLATE \
+	| sed "s|{{ profile_file }}|$PROFILE_FILE|g" \
+	> $LOCAL_MODS
 
 echo >> $LOCAL_MODS  # Add blank line.
 echo "# Make sure WSL lib directory is created for files to be copied to." >> $LOCAL_MODS
