@@ -26,6 +26,10 @@ zypper install --no-recommends --no-confirm password-store
 # Install container based development tools.
 zypper install --no-recommends --no-confirm distrobox podman
 
+# Clean up zypper caches to reduce image size.
+zypper --non-interactive clean --all
+rm --recursive --force /var/log/zypp /var/log/zypper.log
+
 # Give password-less sudo. This is only acceptable as it is a private
 # development environment not exposed to the outside world.
 # Do NOT do this on your host machine or otherwise.
