@@ -27,6 +27,9 @@ CONTAINER_ICON="$CONTAINER_WSL_LIB/devenv.ico"
 LOCAL_TERMINAL_PROFILE="$WSL_DIR/terminal-profile.json"
 CONTAINER_TERMINAL_PROFILE="$CONTAINER_WSL_LIB/terminal-profile.json"
 
+LOCAL_RUNTIME_DIR_OVERRIDE="wsl/runtime-dir-override.conf"
+CONTAINER_RUNTIME_DIR_OVERRIDE="/etc/systemd/system/user-runtime-dir@.service.d/override.conf"
+
 PROFILE_FILE="/etc/profile.local"
 
 repo="$(realpath $(dirname "$0"))"
@@ -111,6 +114,7 @@ podman cp $LOCAL_INIT $container:$CONTAINER_INIT
 podman cp $LOCAL_DIST_CONF $container:$CONTAINER_DIST_CONF
 podman cp $LOCAL_TERMINAL_PROFILE $container:$CONTAINER_TERMINAL_PROFILE
 podman cp $LOCAL_ICON $container:$CONTAINER_ICON
+podman cp $LOCAL_RUNTIME_DIR_OVERRIDE $container:$CONTAINER_RUNTIME_DIR_OVERRIDE
 
 output="$(echo "${image##*/}" | tr ':.' '-_').wsl"
 echo "Exporting container '${container:0:8}' to $output"
