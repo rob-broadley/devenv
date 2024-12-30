@@ -83,14 +83,11 @@ ENVS=$(\
 # Output commands to ensure environment variables defined in /etc/profile.local
 echo >> $LOCAL_MODS  # Add blank line.
 echo "# Set up entrypoint variables." >> $LOCAL_MODS
-echo "touch $PROFILE_FILE" >> $LOCAL_MODS
 while IFS= read -r line
 do
 	setvarline="export $line"
 	echo ensure_line_in_file \"$setvarline\" "$PROFILE_FILE" >> $LOCAL_MODS
 done <<< "$ENVS"
-
-echo ensure_line_in_file \"export BROWSER=/mnt/c/Windows/explorer.exe\" /etc/profile.local >> $LOCAL_MODS
 
 chmod +x $LOCAL_MODS
 
