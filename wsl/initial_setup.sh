@@ -13,10 +13,6 @@ else
 		--shell /bin/zsh \
 		--uid {{ uid }} \
 		$user
-
-	# Make user default.
-	# echo [user] >> /etc/wsl.conf
-	# echo default=$user >> /etc/wsl.conf
 fi
 
 # Enable services.
