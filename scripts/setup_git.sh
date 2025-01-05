@@ -1,32 +1,37 @@
 #!/bin/sh
 
-read -p "Enter name (First_name Last_Name): " name
+printf 'Enter name (First_name Last_Name): ' >&2
+read -r name
 git config --global user.name "$name"
 
-read -p "Enter email address: " email
+printf 'Enter email address: ' >&2
+read -r email
 git config --global user.email "$email"
 
-read -p "Do you want to sign commits (y/n)? " sign
-if [ $sign = "y" ]
+printf 'Do you want to sign commits (y/n)? ' >&2
+read -r sign
+if [ "$sign" = "y" ]
 then
-	read -p "Generate key (y/n)? " generate
-	if [ $generate = "y" ]
+	printf 'Generate key (y/n)? ' >&2
+	read -r generate
+	if [ "$generate" = "y" ]
 	then
 		uid="$name (Git) <$email>"
 		gpg --quick-generate-key "$uid" default default none
 		fpr=$(gpg --list-options show-only-fpr-mbox --list-keys "$uid" | awk '{print $1}')
 		echo "Generated key with fingerprint: $fpr"
-		gpg --quick-add-key $fpr default sign
+		gpg --quick-add-key "$fpr" default sign
 		key=$(\
 			gpg --list-secret-keys --with-colons "$uid" \
-			| awk {'FS=":"; if ($1 == "ssb" && $2 == "u" && $12 == "s") {print $5} }' \
+			| awk '{FS=":"; if ($1 == "ssb" && $2 == "u" && $12 == "s") {print $5} }' \
 			| head -n 1\
 		)
 		echo "Generated signing subkey with ID: $key"
 	else
 		printf "\nAvailable Keys:\n===============\n"
 		gpg --keyid-format LONG --list-secret-keys
-		read -p "Enter signing key: " key
+		printf 'Enter signing key: ' >&2
+		read -r key
 	fi
 	git config --global user.signingKey "$key"
 	git config --global commit.gpgSign true
@@ -60,9 +65,9 @@ printf "\n=============================\n"
 git --no-pager config --global --list
 
 
-if [ $sign = "y" ]
+if [ "$sign" = "y" ]
 then
 	printf "\n\nYour Public GPG Key"
 	printf "\n===================\n"
-	gpg --export --armour $key
+	gpg --export --armour "$key"
 fi

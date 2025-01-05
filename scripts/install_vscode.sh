@@ -18,7 +18,7 @@ code \
 printf "Configuring VSCode...\n"
 VSCODE_SETTINGS_FILE="${HOME}/.config/Code/User/settings.json"
 # Read VSCode settings (stdout of cat) into var, ignoring any errors (stderr).
-settings_json=$(cat $VSCODE_SETTINGS_FILE 2> /dev/null)
+settings_json=$(cat "$VSCODE_SETTINGS_FILE" 2> /dev/null)
 
 # If VSCode settings empty or does not exist, create with desired settings.
 # If not empty, update values for settings of interest.
@@ -27,7 +27,7 @@ then
 	settings_json="{}"
 fi
 new_settings=$(
-	echo $settings_json \
+	echo "$settings_json" \
 	| jq \
 	--tab \
 	--sort-keys \
@@ -46,8 +46,8 @@ new_settings=$(
 return_code=$?
 if [ $return_code -eq 0 ]
 then
-	mkdir --parents $(dirname $VSCODE_SETTINGS_FILE)
-	echo "$new_settings" > $VSCODE_SETTINGS_FILE
+	mkdir --parents "$(dirname "$VSCODE_SETTINGS_FILE")"
+	echo "$new_settings" > "$VSCODE_SETTINGS_FILE"
 else
 	printf "\033[31mERROR\033[0m\n"
 	exit $return_code
