@@ -7,6 +7,9 @@ ENV EDITOR $VISUAL
 # Configure less
 ENV LESS "--clear-screen --RAW-CONTROL-CHARS --tabs 2 --mouse"
 
+# Set colour scheme for ranger preview syntax highlighting.
+ENV PYGMENTIZE_STYLE "one-dark"
+
 # Run tmux session named dev when container starts
 ENTRYPOINT ["tmux"]
 CMD ["new-session", "-A", "-s", "dev"]

@@ -1,0 +1,42 @@
+{
+	"profiles": [
+		{
+			"antialiasingMode": "cleartype",
+			"colorScheme": "One Dark (devenv)",
+			"font": {
+				"size": 10,
+				"weight": "normal"
+			},
+			"startingDirectory": "~",
+			"suppressApplicationTitle": true
+		}
+	],
+	"schemes": [
+		{
+			"name": "One Dark (devenv)",
+
+			"cursorColor": "#5C6370",
+			"selectionBackground": "#5C6370",
+
+			"background" : "#282C34",
+			"foreground" : "#A7AAB0",
+
+			"black": "#101012",
+			"red": "#DE5D68",
+			"green": "#8FB573",
+			"yellow": "#DBB671",
+			"blue": "#57A5E5",
+			"purple": "#BB70D2",
+			"cyan": "#51A8B3",
+			"white": "#ABB2BF",
+			"brightBlack": "#5C6370",
+			"brightRed": "#DE5D68",
+			"brightGreen": "#8FB573",
+			"brightYellow": "#DBB671",
+			"brightBlue": "#57A5E5",
+			"brightPurple": "#BB70D2",
+			"brightCyan": "#51A8B3",
+			"brightWhite": "#FFFEFE"
+		}
+	]
+}

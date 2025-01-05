@@ -1,11 +1,50 @@
 #!/bin/sh
 
 name="${1:-devenv}"
-LOCAL_MODS="tmp_image_mod.sh"
+
+DEFAULT_UID=1000
+
+WSL_DIR="wsl"
+TMP_DIR="$WSL_DIR/tmp"
+mkdir -p $TMP_DIR
+CONTAINER_WSL_LIB="/usr/lib/wsl"
+
+# Script to modify image before distribution.
+MODS_TEMPLATE="$WSL_DIR/image_mod.sh"
+LOCAL_MODS="$TMP_DIR/image_mod.sh"
 CONTAINER_MODS="/tmp/setup.sh"
-LOCAL_INIT="tmp_inital_setup.sh"
-CONTAINER_INIT="/usr/local/bin/initial-setup"
+
+# Script for initial setup by user once installed.
+INIT_TEMPLATE="$WSL_DIR/initial_setup.sh"
+LOCAL_INIT="$TMP_DIR/initial_setup.sh"
+CONTAINER_INIT="$CONTAINER_WSL_LIB/initial-setup.sh"
+
+# WSL distribution configuration and associated files.
+DIST_CONF_TEMPLATE="$WSL_DIR/wsl-distribution.conf"
+LOCAL_DIST_CONF="$TMP_DIR/wsl-distribution.conf"
+CONTAINER_DIST_CONF="/etc/wsl-distribution.conf"
+
+LOCAL_ICON="$WSL_DIR/devenv.ico"
+CONTAINER_ICON="$CONTAINER_WSL_LIB/devenv.ico"
+
+LOCAL_TERMINAL_PROFILE="$WSL_DIR/terminal-profile.json"
+CONTAINER_TERMINAL_PROFILE="$CONTAINER_WSL_LIB/terminal-profile.json"
+
+# Fix for WSLg runtime files not available in XDG_RUNTIME_DIR.
+LOCAL_RUNTIME_DIR_OVERRIDE="$WSL_DIR/runtime-dir-override.conf"
+CONTAINER_RUNTIME_DIR_OVERRIDE="/etc/systemd/system/user-runtime-dir@.service.d/override.conf"
+
+# Fix / not mounted as shared - this is advised for Podman.
+# Use `findmnt / -o PROPOGATION,TARGET` to check.
+LOCAL_SHARED_ROOT_SERVICE="$WSL_DIR/shared-root.service"
+CONTAINER_SHARED_ROOT_SERVICE="/etc/systemd/system/shared-root.service"
+
+# WSL specific configuration for neovim.
+LOCAL_WSL_NVIM="$WSL_DIR/nvim-wsl.lua"
+CONTAINER_WSL_NVIM="/etc/xdg/nvim/lua/wsl.lua"
+
 PROFILE_FILE="/etc/profile.local"
+
 repo="$(realpath $(dirname "$0"))"
 containerfile="${repo}/Containerfile"
 
@@ -26,33 +65,17 @@ echo "Using image: $image"
 # =====================================================================================
 # Create pre-export setup script.
 # =====================================================================================
-cat > $LOCAL_MODS <<'EOF'
-#!/bin/sh
+cat $MODS_TEMPLATE \
+	| sed "s|{{ profile_file }}|$PROFILE_FILE|g" \
+	> $LOCAL_MODS
 
-ensure_line_in_file () {
-	grep -qF "$1" "$2" || ( echo "$1" >> "$2" && return 10 )
-}
+echo >> $LOCAL_MODS  # Add blank line.
+echo "# Make sure WSL lib directory is created for files to be copied to." >> $LOCAL_MODS
+echo "mkdir -p $CONTAINER_WSL_LIB" >> $LOCAL_MODS
 
-# Install WSL compatability packages.
-wsl_conf=/etc/wsl.conf
-zypper install --no-recommends --no-confirm \
-	aaa_base-wsl \
-	patterns-wsl-base \
-	patterns-wsl-systemd \
-	patterns-wsl-gui
-rm $wsl_conf  # The wsl patterns make it a symlink.
-cat > $wsl_conf <<EOF_L
-[boot]
-systemd=true
-
-EOF_L
-# Install password-store (pass), required by rancher/docker desktop.
-# Devcontainer builds fail to pull images without this.
-zypper install --no-recommends --no-confirm password-store
-
-# Set up environment variables.
-touch /etc/profile.local
-EOF
+echo >> $LOCAL_MODS  # Add blank line.
+echo "# Make sure systemd runtimedir override directory is created for files to be copied to." >> $LOCAL_MODS
+echo "mkdir -p $(dirname -- $CONTAINER_RUNTIME_DIR_OVERRIDE)" >> $LOCAL_MODS
 
 # Extract environment variables from Containerfile
 # Separate on lines beginning with ENV on white space but not if inside quotes.
@@ -63,67 +86,61 @@ ENVS=$(\
 )
 
 # Output commands to ensure environment variables defined in /etc/profile.local
+echo >> $LOCAL_MODS  # Add blank line.
+echo "# Set up entrypoint variables." >> $LOCAL_MODS
 while IFS= read -r line
 do
 	setvarline="export $line"
-	echo ensure_line_in_file \"$setvarline\" /etc/profile.local >> $LOCAL_MODS
+	echo ensure_line_in_file \"$setvarline\" "$PROFILE_FILE" >> $LOCAL_MODS
 done <<< "$ENVS"
-
-echo ensure_line_in_file \"export BROWSER=/mnt/c/Windows/explorer.exe\" /etc/profile.local >> $LOCAL_MODS
-
-# Give password-less sudo. This is only acceptable as it is a private
-# development environment not exposed to the outside world.
-# Do NOT do this on your host machine or otherwise.
-printf "\n%s\n" '# Set sudo to not require a password.' >> $LOCAL_MODS
-printf "%s\n" 'echo "%wheel ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers' >> $LOCAL_MODS
 
 chmod +x $LOCAL_MODS
 
 
 # =====================================================================================
-# Create script to create user when running in WSL.
+# Create initial setup script for WSL.
 # =====================================================================================
-cat > $LOCAL_INIT <<'EOF'
-#!/bin/sh
-
-# Create user account.
-read -p "Enter username: " user
-useradd \
-	--create-home \
-	--groups wheel,docker \
-	--shell /bin/zsh \
-	$user
-
-# Make user default.
-echo [user] >> /etc/wsl.conf
-echo default=$user >> /etc/wsl.conf
-
-# Enable services.
-systemctl enable docker
-
-# Upgrade OS.
-printf "\n\nUpgrading OS..."
-zypper dist-upgrade
-
-EOF
-
+cat $INIT_TEMPLATE \
+	| sed "s|{{ uid }}|$DEFAULT_UID|g" \
+	> $LOCAL_INIT
 chmod +x $LOCAL_INIT
+
+
+# =====================================================================================
+# Create WSL distribution configuration file from a template.
+# =====================================================================================
+cat $DIST_CONF_TEMPLATE \
+	| sed "s|{{ initial_setup_script }}|$CONTAINER_INIT|g" \
+	| sed "s|{{ uid }}|$DEFAULT_UID|g" \
+	| sed "s|{{ icon }}|$CONTAINER_ICON|g" \
+	| sed "s|{{ terminal_profile_template }}|$CONTAINER_TERMINAL_PROFILE|g" \
+	> $LOCAL_DIST_CONF
 
 
 # =====================================================================================
 # Create container and export to tar file.
 # =====================================================================================
 container=$(podman run -i --detach --entrypoint=sh $image)
-# echo $container
+
 podman cp $LOCAL_MODS $container:$CONTAINER_MODS
+echo "Running setup inside container '${container:0:8}' ($image)"
+podman exec $container sh -c "$CONTAINER_MODS; rm $CONTAINER_MODS"
+
 podman cp $LOCAL_INIT $container:$CONTAINER_INIT
-echo "Running setup inside container: ${container:0:8} ($image)"
-podman exec $container sh $CONTAINER_MODS
-output="$(echo "${image##*/}" | tr ':.' '-_').tar"
-echo "Exporting container to $output"
-podman export $container > $output
+podman cp $LOCAL_DIST_CONF $container:$CONTAINER_DIST_CONF
+podman cp $LOCAL_TERMINAL_PROFILE $container:$CONTAINER_TERMINAL_PROFILE
+podman cp $LOCAL_ICON $container:$CONTAINER_ICON
+podman cp $LOCAL_RUNTIME_DIR_OVERRIDE $container:$CONTAINER_RUNTIME_DIR_OVERRIDE
+podman cp $LOCAL_SHARED_ROOT_SERVICE $container:$CONTAINER_SHARED_ROOT_SERVICE
+podman cp $LOCAL_WSL_NVIM $container:$CONTAINER_WSL_NVIM
+
+output="$(echo "${image##*/}" | tr ':.' '-_').wsl"
+echo "Exporting container '${container:0:8}' to $output"
+podman export $container | gzip > $output
+
 echo "Stopping container: ${container:0:8}"
 podman stop $container > /dev/null
+
 echo "Removing container: ${container:0:8}"
 podman rm $container > /dev/null
 
@@ -131,6 +148,5 @@ podman rm $container > /dev/null
 # =====================================================================================
 # Clean up and exit.
 # =====================================================================================
-rm $LOCAL_MODS
-rm $LOCAL_INIT
+rm -r $TMP_DIR
 echo Done
