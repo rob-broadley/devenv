@@ -12,6 +12,7 @@ python39
 python310
 python311
 python312
+python313
 python3-invoke
 python3-jupyter
 python3-tox
