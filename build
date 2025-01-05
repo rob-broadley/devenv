@@ -182,10 +182,6 @@ if [ "${container}" -ne 0 ]; then
 	run distrobox enter --no-tty $name -- init_container.sh --
 fi
 
-if [ "${enter}" -ne 0 ]; then
-	run distrobox enter $name
-fi
-
 if [ "${wsl}" -ne 0 ]; then
 	run ./build-wsl $name
 fi
@@ -197,4 +193,8 @@ if [ "${bin}" -ne 0 ]; then
 		'' \
 		"distrobox enter ${name}"
 	run chmod +x "$excfile"
+fi
+
+if [ "${enter}" -ne 0 ]; then
+	run distrobox enter $name
 fi
