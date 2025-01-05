@@ -5,7 +5,7 @@ ensure_line_in_file () {
 }
 
 PROFILE_FILE="{{ profile_file }}"
-touch $PROFILE_FILE
+touch "$PROFILE_FILE"
 
 # Install WSL compatability packages.
 wsl_conf=/etc/wsl.conf
@@ -42,7 +42,7 @@ echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 ensure_line_in_file "lua require('wsl')" '/etc/xdg/nvim/sysinit.vim'
 
 # Hide podman cgroups-v1 deprecation warning.
-ensure_line_in_file 'export PODMAN_IGNORE_CGROUPSV1_WARNING=true' $PROFILE_FILE
+ensure_line_in_file 'export PODMAN_IGNORE_CGROUPSV1_WARNING=true' "$PROFILE_FILE"
 
 # Set Browser to Windows explorer so web links open in Windows web browser.
-ensure_line_in_file 'export BROWSER=/mnt/c/Windows/explorer.exe' $PROFILE_FILE
+ensure_line_in_file 'export BROWSER=/mnt/c/Windows/explorer.exe' "$PROFILE_FILE"

@@ -41,7 +41,7 @@ EOF
 }
 
 # Defaults
-if [ $# -eq 0 ] || [ "$*" == "--dryrun" ] || [ "$*" == "-d" ]; then
+if [ $# -eq 0 ] || [ "$*" = "--dryrun" ] || [ "$*" = "-d" ]; then
 	pull=1
 	image=1
 	container=1
@@ -128,7 +128,7 @@ run() {
 		echo "$*"
 		echo  # Add blank line before next output.
 	else
-		eval "$@"
+		"$@"
 	fi
 }
 
@@ -143,36 +143,42 @@ run() {
 # Outputs:
 #   If dryrun set print file path and content which would be written.
 write_to_file() {
+	file="$1"
+	shift  # Make $@ be just the content to write.
 	if [ "${dryrun}" -ne 0 ]; then
 		# Insert line breaks between lines (items in array) and then add fence around
 		# content to be written. Then output that after declaring where it will be written.
-		echo "Write the following to $1:$(printf '\n```\n%s\n```\n' "$(printf '%s\n' "${@:2}")")"
+		# shellcheck disable=SC2016
+		# False positive, in '\n```\n%s\n```\n' the backticks are not defining an expression.
+		echo "Write the following to $file:$(printf '\n```\n%s\n```\n' "$(printf '%s\n' "$@")")"
 		echo  # Add blank line before next output.
 	else
-		printf '%s\n' "${@:2}" > $1
+		printf '%s\n' "$@" > "$file"
 	fi
 }
 
 if [ "${pull}" -ne 0 ]; then
 	images_to_pull=$(grep FROM Containerfile | sed 's/FROM //g' | sed 's/ as .*$//g')
 	for image_to_pull in $images_to_pull; do
-		run podman pull $image_to_pull
+		run podman pull "$image_to_pull"
 	done
 fi
 
 if [ "${image}" -ne 0 ]; then
-	args=(
-		--label devenv.version=${version}
-		--tag ${name}:latest
-		--tag ${name}:${version}
-		# Set context as directory containing this script.
-		"$(dirname "$0")"
-	)
-	run podman build $(printf "%s " "${args[@]}")
+	args="\
+		--label devenv.version=${version}\
+		--tag ${name}:latest\
+		--tag ${name}:${version}\
+		$(dirname "$0")\
+	"
+	# shellcheck disable=SC2046
+	# Word splitting is required here.
+	run podman build $(echo "$args" | xargs)
 fi
 
 if [ "${container}" -ne 0 ]; then
-	run SHELL=/bin/zsh distrobox assemble create --replace --file distrobox.ini
+	run export SHELL=/bin/zsh
+	run distrobox assemble create --replace --file distrobox.ini
 	run distrobox enter --no-tty $name -- init_container.sh --
 fi
 
@@ -186,7 +192,9 @@ fi
 
 if [ "${bin}" -ne 0 ]; then
 	excfile="${HOME}/.local/bin/${name}"
-	content=('#!/bin/sh' '' "distrobox enter ${name}")
-	write_to_file $excfile "${content[@]}"
-	run chmod +x $excfile
+	write_to_file "$excfile" \
+		'#!/bin/sh' \
+		'' \
+		"distrobox enter ${name}"
+	run chmod +x "$excfile"
 fi

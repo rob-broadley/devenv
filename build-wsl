@@ -45,7 +45,7 @@ CONTAINER_WSL_NVIM="/etc/xdg/nvim/lua/wsl.lua"
 
 PROFILE_FILE="/etc/profile.local"
 
-repo="$(realpath $(dirname "$0"))"
+repo="$(realpath "$(dirname "$0")")"
 containerfile="${repo}/Containerfile"
 
 
@@ -53,7 +53,7 @@ containerfile="${repo}/Containerfile"
 # Get container image to use.
 # =====================================================================================
 # Use the last created devenv image.
-image=$(podman images --format '{{.Repository}}:{{.Tag}}' $name | head -n 1)
+image=$(podman images --format '{{.Repository}}:{{.Tag}}' "$name" | head -n 1)
 if [ -z "$image" ]
 then
 	echo "Error: no image for ${name}"
@@ -65,43 +65,49 @@ echo "Using image: $image"
 # =====================================================================================
 # Create pre-export setup script.
 # =====================================================================================
-cat $MODS_TEMPLATE \
-	| sed "s|{{ profile_file }}|$PROFILE_FILE|g" \
+< $MODS_TEMPLATE \
+	sed "s|{{ profile_file }}|$PROFILE_FILE|g" \
 	> $LOCAL_MODS
 
-echo >> $LOCAL_MODS  # Add blank line.
-echo "# Make sure WSL lib directory is created for files to be copied to." >> $LOCAL_MODS
-echo "mkdir -p $CONTAINER_WSL_LIB" >> $LOCAL_MODS
+{
+	echo  # Add blank line.
+	echo "# Make sure WSL lib directory is created for files to be copied to."
+	echo "mkdir -p $CONTAINER_WSL_LIB"
 
-echo >> $LOCAL_MODS  # Add blank line.
-echo "# Make sure systemd runtimedir override directory is created for files to be copied to." >> $LOCAL_MODS
-echo "mkdir -p $(dirname -- $CONTAINER_RUNTIME_DIR_OVERRIDE)" >> $LOCAL_MODS
+	echo # Add blank line.
+	echo "# Make sure systemd runtimedir override directory is created for files to be copied to."
+	echo "mkdir -p $(dirname -- $CONTAINER_RUNTIME_DIR_OVERRIDE)"
+
+	echo # Add blank line.
+	echo "# Set up environment variables defined in Containerfile."
+} >> $LOCAL_MODS
 
 # Extract environment variables from Containerfile
 # Separate on lines beginning with ENV on white space but not if inside quotes.
 # Output string {2nd column}={3rd column} e.g. ENV EDITOR nvim > EDITOR=nvim
 # Substitute " for \" in variable value (escape the " char)
 ENVS=$(\
-	awk 'BEGIN {FPAT = "([^ ]+)|(\"[^\"]+\")"} /^ENV/{ gsub(/"/, "\\\"", $3); gsub(/\$/, "\\$", $3); print $2"="$3; }' $containerfile
+	awk 'BEGIN {FPAT = "([^ ]+)|(\"[^\"]+\")"} /^ENV/{ gsub(/"/, "\\\"", $3); gsub(/\$/, "\\$", $3); print $2"="$3; }' "$containerfile"
 )
 
 # Output commands to ensure environment variables defined in /etc/profile.local
-echo >> $LOCAL_MODS  # Add blank line.
-echo "# Set up entrypoint variables." >> $LOCAL_MODS
-while IFS= read -r line
+IFS='
+'
+for line in $ENVS
 do
 	setvarline="export $line"
-	echo ensure_line_in_file \"$setvarline\" "$PROFILE_FILE" >> $LOCAL_MODS
-done <<< "$ENVS"
+	echo ensure_line_in_file "\"$setvarline\" \"\$PROFILE_FILE\"" >> $LOCAL_MODS
+done
 
+# Make script executable.
 chmod +x $LOCAL_MODS
 
 
 # =====================================================================================
 # Create initial setup script for WSL.
 # =====================================================================================
-cat $INIT_TEMPLATE \
-	| sed "s|{{ uid }}|$DEFAULT_UID|g" \
+< $INIT_TEMPLATE \
+	sed "s|{{ uid }}|$DEFAULT_UID|g" \
 	> $LOCAL_INIT
 chmod +x $LOCAL_INIT
 
@@ -109,8 +115,8 @@ chmod +x $LOCAL_INIT
 # =====================================================================================
 # Create WSL distribution configuration file from a template.
 # =====================================================================================
-cat $DIST_CONF_TEMPLATE \
-	| sed "s|{{ initial_setup_script }}|$CONTAINER_INIT|g" \
+< $DIST_CONF_TEMPLATE \
+	sed "s|{{ initial_setup_script }}|$CONTAINER_INIT|g" \
 	| sed "s|{{ uid }}|$DEFAULT_UID|g" \
 	| sed "s|{{ icon }}|$CONTAINER_ICON|g" \
 	| sed "s|{{ terminal_profile_template }}|$CONTAINER_TERMINAL_PROFILE|g" \
@@ -120,29 +126,30 @@ cat $DIST_CONF_TEMPLATE \
 # =====================================================================================
 # Create container and export to tar file.
 # =====================================================================================
-container=$(podman run -i --detach --entrypoint=sh $image)
+container=$(podman run -i --detach --entrypoint=sh "$image")
+container_hash=$(printf '%s' "$container" | cut --characters 1-8)
 
-podman cp $LOCAL_MODS $container:$CONTAINER_MODS
-echo "Running setup inside container '${container:0:8}' ($image)"
-podman exec $container sh -c "$CONTAINER_MODS; rm $CONTAINER_MODS"
+podman cp $LOCAL_MODS "$container":$CONTAINER_MODS
+echo "Running setup inside container '$container_hash' ($image)"
+podman exec "$container" sh -c "$CONTAINER_MODS; rm $CONTAINER_MODS"
 
-podman cp $LOCAL_INIT $container:$CONTAINER_INIT
-podman cp $LOCAL_DIST_CONF $container:$CONTAINER_DIST_CONF
-podman cp $LOCAL_TERMINAL_PROFILE $container:$CONTAINER_TERMINAL_PROFILE
-podman cp $LOCAL_ICON $container:$CONTAINER_ICON
-podman cp $LOCAL_RUNTIME_DIR_OVERRIDE $container:$CONTAINER_RUNTIME_DIR_OVERRIDE
-podman cp $LOCAL_SHARED_ROOT_SERVICE $container:$CONTAINER_SHARED_ROOT_SERVICE
-podman cp $LOCAL_WSL_NVIM $container:$CONTAINER_WSL_NVIM
+podman cp $LOCAL_INIT "$container":$CONTAINER_INIT
+podman cp $LOCAL_DIST_CONF "$container":$CONTAINER_DIST_CONF
+podman cp $LOCAL_TERMINAL_PROFILE "$container":$CONTAINER_TERMINAL_PROFILE
+podman cp $LOCAL_ICON "$container":$CONTAINER_ICON
+podman cp $LOCAL_RUNTIME_DIR_OVERRIDE "$container":$CONTAINER_RUNTIME_DIR_OVERRIDE
+podman cp $LOCAL_SHARED_ROOT_SERVICE "$container":$CONTAINER_SHARED_ROOT_SERVICE
+podman cp $LOCAL_WSL_NVIM "$container":$CONTAINER_WSL_NVIM
 
 output="$(echo "${image##*/}" | tr ':.' '-_').wsl"
-echo "Exporting container '${container:0:8}' to $output"
-podman export $container | gzip > $output
+echo "Exporting container '$container_hash' to $output"
+podman export "$container" | gzip > "$output"
 
-echo "Stopping container: ${container:0:8}"
-podman stop $container > /dev/null
+echo "Stopping container: $container_hash"
+podman stop "$container" > /dev/null
 
-echo "Removing container: ${container:0:8}"
-podman rm $container > /dev/null
+echo "Removing container: $container_hash"
+podman rm "$container" > /dev/null
 
 
 # =====================================================================================
