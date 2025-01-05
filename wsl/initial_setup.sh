@@ -1,18 +1,21 @@
 #!/bin/sh
 
+default_uid="{{ uid }}"
+
 # Create user account if one does not exist.
-if getent passwd {{ uid }} > /dev/null ; then
+if getent passwd "$default_uid" > /dev/null ; then
   echo 'A user account already exists, skipping creation'
 else
 	# Create user account.
 	echo 'Creating user account... '
-	read -p '    Enter username: ' user
+	printf '    Enter username: ' >&2
+	read -r user
 	useradd \
 		--create-home \
 		--groups wheel,docker \
 		--shell /bin/zsh \
-		--uid {{ uid }} \
-		$user
+		--uid "$default_uid" \
+		"$user"
 fi
 
 # Enable services.
@@ -27,11 +30,12 @@ systemctl enable docker
 echo  # Line break.
 echo 'Setting up Podman...'
 # Set up UIDs for rootless Podman.
-usermod --add-subuids 100000-165535 --add-subgids 100000-165535 $user
+usermod --add-subuids 100000-165535 --add-subgids 100000-165535 "$user"
 
 # Upgrade OS.
 echo  # Line break.
-read -p 'Upgrade OS? [Y/n]: ' upgrade
+printf 'Upgrade OS? [Y/n]: ' >&2
+read -r upgrade
 echo  # Line break.
 case $upgrade in
 	[Nn]*)
