@@ -46,3 +46,8 @@ ensure_line_in_file 'export PODMAN_IGNORE_CGROUPSV1_WARNING=true' "$PROFILE_FILE
 
 # Set Browser to Windows explorer so web links open in Windows web browser.
 ensure_line_in_file 'export BROWSER=/mnt/c/Windows/explorer.exe' "$PROFILE_FILE"
+
+# Enable true colour support in apps which check the COLORTERM variable.
+# Most terminals which support true colour set this, but windows terminal does not.
+# See: https://github.com/microsoft/terminal/issues/11057.
+ensure_line_in_file 'export COLORTERM=truecolor' "$PROFILE_FILE"
