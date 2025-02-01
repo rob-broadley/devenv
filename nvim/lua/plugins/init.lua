@@ -7,5 +7,5 @@ return {
 	'tpope/vim-commentary',
 	'vim-pandoc/vim-pandoc',
 	{'fannheyward/coc-pyright', build = 'npm ci'},
-	-- {'neoclide/coc-json', build = 'npm ci'},
+	{'neoclide/coc-json', build = 'yarn install --frozen-lockfile'},
 }

@@ -23,7 +23,7 @@ docker docker-buildx docker-compose docker-zsh-completion
 # Compliers
 gcc gcc-c++
 # For development
-npm-default
+npm-default yarn
 ShellCheck
 # IP Tools
 iproute2 net-tools
