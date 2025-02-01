@@ -33,11 +33,6 @@ printf "%-40s\t" "Update installed packages..."
 output=$(sudo zypper dist-upgrade --no-confirm 2>&1)
 handle_status_code $? "$output"
 
-# Install Nvim and Coc Plugins (By running vim lazy.nvim will do installs).
-printf "%-40s\t" "Setting up neovim..."
-output=$(nvim --headless -c ":CocInstall -sync coc-json" +qa 2>&1)
-handle_status_code $? "$output"
-
 # Set up app passthrough.
 printf "%-40s\t" "Setting up application passthroughs..."
 output=$(
