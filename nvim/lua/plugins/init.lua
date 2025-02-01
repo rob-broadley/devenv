@@ -6,7 +6,6 @@ return {
 	'tpope/vim-fugitive',
 	'tpope/vim-commentary',
 	'vim-pandoc/vim-pandoc',
-	'vim-pandoc/vim-pandoc-syntax',
 	{'fannheyward/coc-pyright', build = 'npm ci'},
 	-- {'neoclide/coc-json', build = 'npm ci'},
 }
