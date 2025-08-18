@@ -6,7 +6,7 @@ sudo --shell -- <<EOF
 rpm --import https://packages.microsoft.com/keys/microsoft.asc
 zypper addrepo https://packages.microsoft.com/yumrepos/vscode vscode
 zypper refresh
-zypper install --no-confirm code dejavu-fonts symbols-only-nerd-fonts
+zypper install --no-confirm code dejavu-fonts libsecret symbols-only-nerd-fonts
 EOF
 
 # Install extensions:
