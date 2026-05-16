@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# Interactive setup script for global git configuration.
+# Configures user identity, optional GPG commit signing, and git preferences.
+# Prerequisites: git; gpg (gnupg2) if enabling commit signing.
+
 printf 'Enter name (First_name Last_Name): ' >&2
 read -r name
 git config --global user.name "$name"
@@ -19,14 +23,24 @@ then
 		uid="$name (Git) <$email>"
 		gpg --quick-generate-key "$uid" default default none
 		fpr=$(gpg --list-options show-only-fpr-mbox --list-keys "$uid" | awk '{print $1}')
-		echo "Generated key with fingerprint: $fpr"
+		if [ -z "$fpr" ]; then
+			printf 'Failed to extract GPG key fingerprint.\n' >&2
+			exit 1
+		fi
+		printf '%s\n' "Generated key with fingerprint: $fpr"
 		gpg --quick-add-key "$fpr" default sign
+		# BEGIN { FS=":" } is required: FS set in the action block applies only from
+		# the second record onward, so the first record would be split on whitespace.
 		key=$(\
 			gpg --list-secret-keys --with-colons "$uid" \
-			| awk '{FS=":"; if ($1 == "ssb" && $2 == "u" && $12 == "s") {print $5} }' \
+			| awk 'BEGIN { FS=":" } $1 == "ssb" && $2 == "u" && $12 == "s" { print $5 }' \
 			| head -n 1\
 		)
-		echo "Generated signing subkey with ID: $key"
+		if [ -z "$key" ]; then
+			printf 'Failed to extract GPG signing subkey ID.\n' >&2
+			exit 1
+		fi
+		printf '%s\n' "Generated signing subkey with ID: $key"
 	else
 		printf "\nAvailable Keys:\n===============\n"
 		gpg --keyid-format LONG --list-secret-keys
