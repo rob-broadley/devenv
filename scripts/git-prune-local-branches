@@ -1,0 +1,186 @@
+#!/bin/sh
+
+# Prune local branches whose upstream remote branch is marked [gone].
+#
+# Requires a controlling terminal for interactive prompts unless --dry-run is
+# used. The current branch is never deleted. Each stale branch is first offered
+# a safe `git branch -d`; if that fails, the user can choose a force delete via
+# `git branch -D`. --dry-run lists the candidate branches without prompting or
+# deleting anything. Exit status is 0 when the run succeeds, including when all
+# branches are skipped, and 1 when a command or terminal read fails.
+
+usage() {
+    cat <<'EOF_USAGE'
+Usage: git prune-local-branches [--dry-run]
+
+List local branches whose upstream remote branch has been deleted.
+
+Options:
+  --dry-run  Show stale local branches without prompting or deleting (exit status 0).
+  -h, --help Show this help message and exit.
+
+Invoke as: git prune-local-branches
+EOF_USAGE
+}
+
+dry_run=0
+
+while [ "$#" -gt 0 ]; do
+    case $1 in
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        --dry-run)
+            dry_run=1
+            ;;
+        *)
+            printf 'Unknown option: %s\n\n' "$1" >&2
+            usage >&2
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    printf 'Not inside a git repository.\n' >&2
+    exit 1
+fi
+
+ref_lines=$(git for-each-ref --format='%(refname:short) %(upstream:track)' refs/heads) || {
+    printf 'Failed to list local branches.\n' >&2
+    exit 1
+}
+
+gone_branches=$(printf '%s\n' "$ref_lines" | awk '/ \[gone\]$/ { print $1 }') || {
+    printf 'Failed to filter branch list.\n' >&2
+    exit 1
+}
+
+if [ -z "$gone_branches" ]; then
+    printf "No stale local branches found. You're all clean!\n"
+    exit 0
+fi
+
+current_branch=$(git symbolic-ref --quiet --short HEAD 2>/dev/null || :)
+
+printf '\nThe following local branches are tracking a deleted remote branch:\n\n'
+# Feed the candidate list via heredoc so stdin stays free for interactive reads on fd3.
+while IFS= read -r branch; do
+    [ -n "$branch" ] || continue
+
+    if [ -n "$current_branch" ] && [ "$branch" = "$current_branch" ]; then
+        printf '  - %s (current branch)\n' "$branch"
+    else
+        printf '  - %s\n' "$branch"
+    fi
+done <<EOF_BRANCH_LIST
+$gone_branches
+EOF_BRANCH_LIST
+printf '\n'
+
+if [ "$dry_run" -eq 1 ]; then
+    printf 'Dry run: no local branches were deleted.\n'
+    exit 0
+fi
+
+deleted_count=0
+force_deleted_count=0
+skipped_count=0
+failed_count=0
+
+# Stdin is consumed by the heredoc loops, so prompt/response I/O uses fd3 on /dev/tty.
+if ! exec 3<> /dev/tty; then
+    printf 'Interactive terminal required: /dev/tty is unavailable.\n' >&2
+    exit 1
+fi
+
+# Feed the action loop via heredoc so stdin stays free for interactive reads on fd3.
+while IFS= read -r branch; do
+    [ -n "$branch" ] || continue
+
+    if [ -n "$current_branch" ] && [ "$branch" = "$current_branch" ]; then
+        printf "Skipping current branch '%s' — switch away first to delete it.\n\n" "$branch"
+        skipped_count=$((skipped_count + 1))
+        continue
+    fi
+
+    if ! show_ref_output=$(git show-ref --verify "refs/heads/$branch" 2>&1); then
+        # exit 128 with "not a valid ref" means the branch no longer exists
+        case $show_ref_output in
+            *"not a valid ref"*)
+                printf "Branch '%s' no longer exists — already cleaned up.\n" "$branch"
+                skipped_count=$((skipped_count + 1))
+                printf '\n'
+                continue
+                ;;
+            *)
+                printf '%s\n' "$show_ref_output" >&2
+                printf "Unexpected error checking branch '%s'; skipping.\n" "$branch" >&2
+                failed_count=$((failed_count + 1))
+                printf '\n'
+                continue
+                ;;
+        esac
+    fi
+
+    printf "Delete local branch '%s'? [y/N] " "$branch" >&3
+    if ! IFS= read -r response <&3; then
+        printf '\nFailed to read response from terminal.\n' >&2
+        exec 3>&-
+        exit 1
+    fi
+
+    case $response in
+        [Yy])
+            if delete_output=$(git branch -d "$branch" 2>&1); then
+                printf '%s\n' "$delete_output"
+                deleted_count=$((deleted_count + 1))
+            else
+                printf '%s\n' "$delete_output" >&2
+                printf "Force delete '%s'? It may have unmerged commits. [y/N] " "$branch" >&3
+                if ! IFS= read -r force_response <&3; then
+                    printf '\nFailed to read response from terminal.\n' >&2
+                    exec 3>&-
+                    exit 1
+                fi
+
+                case $force_response in
+                    [Yy])
+                        if force_output=$(git branch -D "$branch" 2>&1); then
+                            printf '%s\n' "$force_output"
+                            force_deleted_count=$((force_deleted_count + 1))
+                        else
+                            printf '%s\n' "$force_output" >&2
+                            printf "Failed to force delete '%s'.\n" "$branch" >&2
+                            failed_count=$((failed_count + 1))
+                        fi
+                        ;;
+                    *)
+                        printf "Left '%s' in place.\n" "$branch"
+                        skipped_count=$((skipped_count + 1))
+                        ;;
+                esac
+            fi
+            ;;
+        *)
+            printf "Skipped '%s'\n" "$branch"
+            skipped_count=$((skipped_count + 1))
+            ;;
+    esac
+
+    printf '\n'
+done <<EOF_GONE_BRANCHES
+$gone_branches
+EOF_GONE_BRANCHES
+
+exec 3>&-
+
+printf 'Done. Deleted: %s (force: %s), Skipped: %s, Failed: %s.\n' \
+    "$deleted_count" "$force_deleted_count" "$skipped_count" "$failed_count"
+
+if [ "$failed_count" -gt 0 ]; then
+    exit 1
+fi
+# vi: set ft=sh:

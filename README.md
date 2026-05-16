@@ -94,6 +94,7 @@ Periodic OS updates should be performed using `sudo zypper dup` (`dup` is short 
 - install_python_dev_tools.sh: installs common Python development tools, including recent Python versions.
 - install_vscode.sh: installs VSCode inside the running distrobox and exposes it to the host.
 - git-commit-retry: re-open the most recent abandoned commit message in the editor to retry a commit. Invoked as `git commit-retry`.
+- git-prune-local-branches: interactively delete local branches whose remote tracking branch has been deleted. Invoked as `git prune-local-branches [--dry-run]`.
 
 ## Miscellaneous
 
