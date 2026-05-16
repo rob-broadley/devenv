@@ -41,6 +41,7 @@ fi
 git config --global blame.coloring highlightRecent
 git config --global diff.colorMoved zebra
 git config --global diff.tool nvimdiff
+git config --global fetch.prune true
 git config --global init.defaultBranch main
 git config --global log.date auto:relative
 git config --global merge.log true
