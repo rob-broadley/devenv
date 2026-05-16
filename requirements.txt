@@ -8,8 +8,6 @@ neovim
 ranger
 # Version control
 git gh gh-zsh-completion python3-gitlint python3-pre-commit
-# For nvim
-python3-neovim
 # To set editor settings
 editorconfig
 # For ranger preview of archives (also useful tool)
