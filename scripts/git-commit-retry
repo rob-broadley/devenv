@@ -1,0 +1,49 @@
+#!/bin/sh
+
+# Re-open the most recent abandoned commit message in the editor so a commit
+# can be retried without using `git commit --amend`, which would rewrite
+# history. This is useful after aborting a commit while composing the message.
+
+usage() {
+    cat <<'EOF_USAGE'
+Usage: git commit-retry [git-commit-options]
+
+Re-open the most recent COMMIT_EDITMSG in your editor and retry the commit.
+Arguments are appended to: git commit -eF <COMMIT_EDITMSG>
+
+Note: message-overriding flags (-m, --template, --no-edit) may conflict
+with -F and produce unexpected results.
+
+Options:
+  -h, --help  Show this help message and exit (recognised only as first argument).
+
+Exit status mirrors git commit (0 on success, non-zero on failure).
+Prerequisites: git repository with a non-empty COMMIT_EDITMSG from a prior
+aborted commit; a configured $EDITOR or $VISUAL.
+EOF_USAGE
+}
+
+for arg in "$@"; do
+    case $arg in
+        --help|-h)
+            usage
+            exit 0
+            ;;
+    esac
+done
+
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    printf 'Not inside a git repository.\n' >&2
+    exit 1
+fi
+
+commit_editmsg=$(git rev-parse --git-dir)/COMMIT_EDITMSG
+
+if [ ! -s "$commit_editmsg" ]; then
+    printf 'COMMIT_EDITMSG is missing or empty: %s\n' "$commit_editmsg" >&2
+    printf 'Run this after an aborted git commit.\n' >&2
+    exit 1
+fi
+
+git commit -eF "$commit_editmsg" "$@"
+# vi: set ft=sh:

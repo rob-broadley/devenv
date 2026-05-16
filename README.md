@@ -93,6 +93,7 @@ Periodic OS updates should be performed using `sudo zypper dup` (`dup` is short 
 - setup_git.sh: configure git with user info and some customisation.
 - install_python_dev_tools.sh: installs common Python development tools, including recent Python versions.
 - install_vscode.sh: installs VSCode inside the running distrobox and exposes it to the host.
+- git-commit-retry: re-open the most recent abandoned commit message in the editor to retry a commit. Invoked as `git commit-retry`.
 
 ## Miscellaneous
 
