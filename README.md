@@ -87,6 +87,7 @@ a different name will have to be set via the WSL CLI on install of the distribut
 ## Maintenance
 
 Periodic OS updates should be performed using `sudo zypper dup` (`dup` is short for `dist-upgrade`).
+If the upgrade installs or removes `tree-sitter-*` packages, re-run `nvim-gen-treesitter-parsers` inside the container afterwards to regenerate the parser registration table.
 
 ## Included Scripts
 
@@ -95,6 +96,7 @@ Periodic OS updates should be performed using `sudo zypper dup` (`dup` is short 
 - install_vscode.sh: installs VSCode inside the running distrobox and exposes it to the host.
 - git-commit-retry: re-open the most recent abandoned commit message in the editor to retry a commit. Invoked as `git commit-retry`.
 - git-prune-local-branches: interactively delete local branches whose remote tracking branch has been deleted. Invoked as `git prune-local-branches [--dry-run]`.
+- nvim-gen-treesitter-parsers: generates `/etc/xdg/nvim/lua/treesitter_parsers.lua`, a static Lua table of installed tree-sitter parser paths and symbols used by Neovim at startup for syntax highlighting, indent, and folding. Re-run after installing or removing `tree-sitter-*` packages.
 
 ## Miscellaneous
 

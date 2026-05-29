@@ -8,15 +8,18 @@ vim.opt.spell = true
 vim.opt.spelllang = "en_gb"
 vim.opt.splitright = true
 vim.opt.splitbelow = true
+vim.opt.foldlevelstart = 99 -- keep all folds open on file open (Tree-sitter fold expressions collapse everything otherwise)
+
+local augroup = vim.api.nvim_create_augroup("init", {clear = true})
 
 -- Leave insert mode when focus lost.
 vim.api.nvim_create_autocmd(
 	{"FocusLost", "TabLeave"},
-	{command = "stopinsert"}
+	{group = augroup, command = "stopinsert"}
 )
 
 -- End configuration here if running as privileged / system user.
-if tonumber(vim.fn.expand("$EUID")) < 1000 then
+if vim.uv.getuid() < 1000 then
 	return
 end
 
@@ -44,6 +47,13 @@ local opts = {
 }
 -- Load / Configure plugins.
 require("lazy").setup("plugins", opts)
+
+-- nvim-treesitter was archived April 2026 (runtime error: attempt to call method
+-- 'range'); replaced with Neovim's built-in Tree-sitter engine (see treesitter.lua).
+local ts_ok, ts_err = pcall(require, 'treesitter')
+if not ts_ok then
+	vim.notify('treesitter: failed to load module: ' .. tostring(ts_err), vim.log.levels.ERROR)
+end
 
 -- Completion
 -- Autocomplete with dictionary words when spell check is on.

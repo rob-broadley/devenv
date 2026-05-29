@@ -4,6 +4,43 @@ tmux
 zsh
 # Text editor
 neovim
+# Build-time only: used by nvim-gen-treesitter-parsers to introspect .so symbols.
+# Not needed at runtime — remove from the running container if attack surface is a concern.
+binutils
+# Tree-sitter parsers (installed to /usr/lib64/tree-sitter/ — auto-registered in nvim/lua/treesitter.lua)
+tree-sitter-bash
+tree-sitter-bitbake
+tree-sitter-c
+tree-sitter-c-sharp
+tree-sitter-cpp
+tree-sitter-css
+tree-sitter-csv
+tree-sitter-gitattributes
+tree-sitter-go
+tree-sitter-go-sum
+tree-sitter-gomod
+tree-sitter-gpg-config
+tree-sitter-html
+tree-sitter-java
+tree-sitter-javascript
+tree-sitter-jinja2
+tree-sitter-json
+tree-sitter-lua
+tree-sitter-luadoc
+tree-sitter-markdown
+tree-sitter-python
+tree-sitter-query
+tree-sitter-requirements
+tree-sitter-rpmspec
+tree-sitter-rst
+tree-sitter-rust
+tree-sitter-ssh-config
+tree-sitter-toml
+tree-sitter-typescript
+tree-sitter-vim
+tree-sitter-vimdoc
+tree-sitter-xml
+tree-sitter-yaml
 # File manager
 ranger
 # Version control

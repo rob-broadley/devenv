@@ -15,12 +15,12 @@ ENTRYPOINT ["tmux"]
 CMD ["new-session", "-A", "-s", "dev"]
 
 # Get list of required packages
-# Lines are joined by a space, Lines beginning with # are ignored
+# Non-comment lines are passed as separate arguments to zypper via xargs.
 COPY requirements.txt /tmp/requirements.txt
 # Add Packages and remove directories used by zypper that are just taking up space
 RUN --mount=type=cache,target=/var/cache \
     zypper refresh \
-    && zypper install --no-recommends --no-confirm $(grep -v '^#' /tmp/requirements.txt | tr "\n" " ")
+    && grep -v '^#' /tmp/requirements.txt | xargs -r zypper install --no-recommends --no-confirm
 
 # Add useful scripts
 COPY scripts /usr/local/bin/
@@ -53,5 +53,34 @@ COPY zsh/zshrc /etc/zsh.zshrc.local
 # Set up neovim
 COPY nvim/sysinit.vim /etc/xdg/nvim/sysinit.vim
 COPY nvim/lua /etc/xdg/nvim/lua/
+# Fetch Tree-sitter query files (highlights, indent, fold, injections, etc.)
+# for all languages from the nvim-treesitter query corpus (queries/ only — no Lua runtime fetched).
+# The archived repo is permanently readable; query files are static text.
+# Pinned to the final commit before archival.
+RUN <<EOF
+set -e
+git clone --filter=blob:none --sparse \
+    https://github.com/nvim-treesitter/nvim-treesitter.git /tmp/nvim-ts
+git -C /tmp/nvim-ts -c advice.detachedHead=false checkout 4916d6592ede8c07973490d9322f187e07dfefac
+git -C /tmp/nvim-ts sparse-checkout set runtime/queries
+# Verify sparse checkout populated the queries directory before copying.
+[ -d /tmp/nvim-ts/runtime/queries/lua ] || { echo "ERROR: sparse checkout incomplete — queries/lua missing"; exit 1; }
+mkdir -p /etc/xdg/nvim/queries
+cp -r /tmp/nvim-ts/runtime/queries/. /etc/xdg/nvim/queries/
+# Verify the copy succeeded — at least the lua queries must be present.
+[ -d /etc/xdg/nvim/queries/lua ] || { echo "ERROR: query copy failed or incomplete"; exit 1; }
+rm -rf /tmp/nvim-ts
+EOF
+
+# Generate a static Lua table mapping each installed tree-sitter parser to its
+# shared-object path. Avoids runtime nm/dlsym discovery overhead.
+# Re-run nvim-gen-treesitter-parsers inside the container after installing
+# or removing tree-sitter-* packages.
+RUN <<EOF
+set -e
+nvim-gen-treesitter-parsers
+grep -q 'lang=' /etc/xdg/nvim/lua/treesitter_parsers.lua \
+    || { echo "ERROR: treesitter_parsers.lua is empty — no parsers registered"; exit 1; }
+EOF
 
 # vim: set ft=dockerfile:
