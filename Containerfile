@@ -19,6 +19,13 @@ ENV TMUX_TMPDIR /tmp
 ENTRYPOINT ["tmux"]
 CMD ["new-session", "-A", "-s", "dev"]
 
+# distrobox-init (setup_zypper) runs sed -i on /etc/zypp/zypp.conf to enable
+# recommended packages. distrobox-init sets -o errexit, so sed failing on a
+# missing file aborts container setup. openSUSE UsrMerge moved the default
+# config to /usr/etc/zypp/zypp.conf; /etc/zypp/zypp.conf is no longer shipped.
+# Symlink it so distrobox-init's sed has a valid target.
+RUN ln -sf /usr/etc/zypp/zypp.conf /etc/zypp/zypp.conf
+
 # Get list of required packages
 # Non-comment lines are passed as separate arguments to zypper via xargs.
 COPY requirements.txt /tmp/requirements.txt
