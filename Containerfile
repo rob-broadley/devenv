@@ -10,6 +10,11 @@ ENV LESS "--clear-screen --RAW-CONTROL-CHARS --tabs 2 --mouse"
 # Set colour scheme for ranger preview syntax highlighting.
 ENV PYGMENTIZE_STYLE "one-dark"
 
+# tmux defaults to /run/tmux/<uid>/ for its socket, but /run is a tmpfs
+# remounted fresh on each container start so the directory never exists.
+# Redirect to /tmp which is always available.
+ENV TMUX_TMPDIR /tmp
+
 # Run tmux session named dev when container starts
 ENTRYPOINT ["tmux"]
 CMD ["new-session", "-A", "-s", "dev"]
