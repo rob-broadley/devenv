@@ -25,15 +25,24 @@ end
 
 -- Set up plugin manager.
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
   vim.fn.system({
     "git",
     "clone",
     "--filter=blob:none",
+    "-c", "advice.detachedHead=false",
     "https://github.com/folke/lazy.nvim.git",
-    "--branch=stable", -- latest stable release
+    "--branch", "stable",
     lazypath,
   })
+  if vim.v.shell_error ~= 0 then
+    vim.notify("lazy.nvim: git clone failed (exit " .. vim.v.shell_error .. ")", vim.log.levels.ERROR)
+    return
+  end
+  vim.fn.system({"git", "-C", lazypath, "-c", "advice.detachedHead=false", "checkout", "85c7ff3711b730b4030d03144f6db6375044ae82"})
+  if vim.v.shell_error ~= 0 then
+    vim.notify("lazy.nvim: git checkout of pinned SHA failed (exit " .. vim.v.shell_error .. ")", vim.log.levels.ERROR)
+  end
 end
 vim.opt.rtp:prepend(lazypath)
 local opts = {
